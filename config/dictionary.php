@@ -58,7 +58,7 @@ $dict_sandi_pinjaman = [
     '04' => 'KOREKSI LEBIH SETOR TUNAI', '05' => 'KOREKSI KURANG SETOR TUNAI', '06' => 'TRANSFER BANK', 
     '07' => 'SETORAN PEMINDAHBUKUAN', '08' => 'PELUNASAN TUNAI PINJAMAN', '09' => 'KOREKSI LEBIH SETOR PEMINDAHBUKUAN',
     '10' => 'KOREKSI KURANG SETOR PEMINDAHBUKUAN', '11' => 'PEMB. JASA KURANG NON TUNAI',
-    '12' => 'PELUNASAN PINJAMAN NON TUNAI', '14' => 'POTONGAN GAJI'
+    '12' => 'PELUNASAN PINJAMAN NON TUNAI', '14' => 'POTONGAN GAJI', '15' => 'JUDI'
 ];
 
 // Fungsi bantuan untuk mencegah error jika kode tidak ditemukan di kamus

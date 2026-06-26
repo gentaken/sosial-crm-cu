@@ -42,7 +42,7 @@
     <div class="card shadow-sm border-0 mb-4 border-top border-4 border-primary">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-speedometer2 me-2"></i> Executive Summary: Rapor Kelayakan Finansial</h6>
-            <span class="badge bg-light text-dark border">Consolidated LOS Version</span>
+            <span class="badge bg-light text-dark border">Consolidated Core & Profiling Data</span>
         </div>
         <div class="card-body bg-light">
             <div class="row g-4">
@@ -97,7 +97,7 @@
 
                 <div class="col-md-4">
                     <div class="p-3 bg-white border rounded h-100 shadow-sm d-flex flex-column justify-content-center">
-                        <span class="d-block small fw-bold text-muted mb-3 text-uppercase text-center">Rekomendasi Dokumen Survei</span>
+                        <span class="d-block small fw-bold text-muted mb-3 text-uppercase text-center">Rekomendasi Sistem</span>
                         <div class="d-flex flex-wrap gap-2 justify-content-center">
                             <?php foreach($rapor['badges'] as $badge): ?>
                                 <span class="badge <?= $badge['bg'] ?> p-2 fs-6 shadow-sm">
@@ -118,7 +118,7 @@
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pekerjaan" type="button">2. Pekerjaan</button></li>
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-portofolio" type="button">3. Portofolio</button></li>
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-keluarga" type="button">4. Keluarga</button></li>
-                <li class="nav-item"><button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#tab-kunjungan" type="button">5. Survei & Appraisal LOS</button></li>
+                <li class="nav-item"><button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#tab-kunjungan" type="button">5. Profiling & Pendampingan</button></li>
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-organisasi" type="button">6. Organisasi</button></li>
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-diklat" type="button">7. Diklat CU</button></li>
                 <li class="nav-item"><button class="nav-link fw-bold text-primary" data-bs-toggle="tab" data-bs-target="#tab-dokumen" type="button">8. Arsip Digital</button></li>
@@ -360,7 +360,7 @@
                                                                 <td class="text-end fw-bold currency-text border-end"><?= number_format($trx['Saldo_SW'], 0, ',', '.') ?></td>
                                                                 <td class="text-end fw-bold currency-text"><?= number_format($trx['Saldo_SS'], 0, ',', '.') ?></td>
                                                                 <td class="border-start"><?= htmlspecialchars($trx['Keterangan']) ?></td>
-                                                            </tr>
+                                                           </tr>
                                                         <?php endforeach; else: ?>
                                                             <tr><td colspan="9" class="text-center text-muted py-3">Belum ada riwayat transaksi keanggotaan.</td></tr>
                                                         <?php endif; ?>
@@ -368,7 +368,7 @@
                                                 </table>
                                             </div>
                                             <div class="bg-light p-3 border-top d-flex justify-content-end align-items-center">
-                                                <span class="text-muted small me-3 text-uppercase fw-bold">Total Saldo:</span>
+                                                <span class="text-muted small me-3 text-uppercase fw-bold">Total Saldo Ekuitas Core:</span>
                                                 <span class="fs-5 fw-bold text-success">Rp <?= number_format($rapor['total_aset_core'], 0, ',', '.') ?></span>
                                             </div>
                                         </div>
@@ -445,174 +445,160 @@
                 <div class="tab-pane fade" id="tab-kunjungan" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                         <div>
-                            <h6 class="fw-bold mb-0 text-success"><i class="bi bi-calculator-fill"></i> Lembar Appraisal Finansial & Dokumen Survei Lapangan</h6>
-                            <p class="text-muted small mb-0">Platform otomasi analisis kelayakan, aktuaris kesehatan, dan RAB Multi-Usaha.</p>
+                            <h6 class="fw-bold mb-0 text-success"><i class="bi bi-person-lines-fill"></i> Lembar Profiling Anggota & Rencana Tindak Lanjut Pendampingan</h6>
+                            <p class="text-muted small mb-0">Platform inkubasi kesejahteraan sosial ekonomi anggota melalui pendekatan proaktif ter-agenda.</p>
                         </div>
                         <button class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahProfiling">
-                            <i class="bi bi-journal-plus"></i> Buat Laporan Survei/Appraisal Baru
+                            <i class="bi bi-journal-plus"></i> Agendakan & Catat Profiling Baru
                         </button>
                     </div>
 
                     <?php if (!empty($data_survei_master)): $m_latest = $data_survei_master[0]; ?>
-                        <div class="alert alert-dark border py-2 d-flex justify-content-between align-items-center">
-                            <span><strong>Hasil Survei Terakhir:</strong> <?= date('d M Y', strtotime($m_latest['tgl_survei'])) ?></span>
-                            <span class="badge bg-secondary">Surveyor: <?= htmlspecialchars($m_latest['nama_petugas']) ?></span>
+                        
+                        <div class="card border-0 bg-light shadow-sm mb-4">
+                            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i> Resume Naratif Profil Anggota</h6>
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary small">Auto-Generated Resume</span>
+                            </div>
+                            <div class="card-body p-4 fs-6 text-dark lh-base" style="text-align: justify;">
+                                <?= $rapor['narasi_profiling'] ?>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-lightbulb-fill text-warning me-2"></i> Poin Rekomendasi Langkah Kerja & Intervensi Pendampingan CU</h6>
+                        <div class="row g-3 mb-4">
+                            <?php foreach($rapor['rekomendasi_pendampingan'] as $rec): ?>
+                                <div class="col-md-12">
+                                    <div class="card border-0 shadow-sm border-start border-4 border-<?= $rec['color'] ?> h-100">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="p-2 bg-<?= $rec['color'] ?> bg-opacity-10 text-<?= $rec['color'] ?> rounded-circle me-3">
+                                                    <i class="bi <?= $rec['icon'] ?> fs-5"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-0 text-uppercase small" style="letter-spacing: 0.5px;"><?= $rec['aspek'] ?></h6>
+                                            </div>
+                                            <p class="text-muted small mb-0 p-1 bg-white border rounded p-2 text-dark" style="font-size:0.88rem; line-height:1.4;"><?= $rec['saran'] ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
 
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
-                                    <div class="card-header bg-primary bg-opacity-10 py-2 fw-bold text-primary small text-uppercase"><i class="bi bi-house-fill me-1"></i> A. Posisi Neraca Rumah Tangga / Keluarga</div>
+                                    <div class="card-header bg-primary bg-opacity-10 py-2 fw-bold text-primary small text-uppercase"><i class="bi bi-house-fill me-1"></i> A. Posisi Keuangan Rumah Tangga / Keluarga</div>
                                     <div class="card-body small">
-                                        <h6 class="fw-bold text-success mb-2">Harta / Aset Keluarga</h6>
+                                        <h6 class="fw-bold text-success mb-2">Harta / Aset Konsumtif Keluarga</h6>
                                         <ul class="list-group list-group-flush mb-3">
                                             <?php $has_fam_aset = false; foreach($detail_aset as $ast): if($ast['entitas']=='Keluarga'): $has_fam_aset=true; ?>
-                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1">
+                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1 px-0">
                                                     <div><strong><?= htmlspecialchars($ast['nama_aset']) ?></strong> <span class="text-muted d-block" style="font-size:0.75rem;"><?= htmlspecialchars($ast['kondisi_deskripsi']) ?> (<?= $ast['kategori_aset'] ?>)</span></div>
                                                     <span class="fw-bold text-dark">Rp <?= number_format($ast['nilai_pasar'],0,',','.') ?></span>
                                                 </li>
-                                            <?php endif; endforeach; if(!$has_fam_aset): ?><li class="list-group-item text-muted fst-italic text-center">Tidak ada aset keluarga luar sistem</li><?php endif; ?>
+                                            <?php endif; endforeach; if(!$has_fam_aset): ?><li class="list-group-item text-muted fst-italic text-center py-2">Tidak ada aset keluarga luar sistem</li><?php endif; ?>
                                         </ul>
                                         <h6 class="fw-bold text-danger mb-2">Kewajiban Konsumtif (Luar CU)</h6>
                                         <ul class="list-group list-group-flush">
                                             <?php $has_fam_htg = false; foreach($detail_hutang as $htg): if($htg['entitas']=='Keluarga'): $has_fam_htg=true; ?>
-                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1">
+                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1 px-0">
                                                     <div><strong><?= htmlspecialchars($htg['sumber_kreditur']) ?></strong> <span class="text-muted d-block" style="font-size:0.75rem;">Keperluan: <?= htmlspecialchars($htg['tujuan_penggunaan']) ?> | Cicilan: Rp <?= number_format($htg['angsuran_perbulan'],0,',','.') ?>/bln</span></div>
                                                     <span class="fw-bold text-danger">Rp <?= number_format($htg['sisa_outstanding'],0,',','.') ?></span>
                                                 </li>
-                                            <?php endif; endforeach; if(!$has_fam_htg): ?><li class="list-group-item text-muted fst-italic text-center">Bebas hutang keluarga luar</li><?php endif; ?>
+                                            <?php endif; endforeach; if(!$has_fam_htg): ?><li class="list-group-item text-muted fst-italic text-center py-2">Bebas hutang keluarga luar</li><?php endif; ?>
                                         </ul>
-                                        <div class="bg-light p-2 rounded mt-3 d-flex justify-content-between fw-bold border">
-                                            <span>Subtotal Bersih Keluarga:</span>
-                                            <span class="text-primary">Rp <?= number_format($rapor['total_aset_keluarga'] - $rapor['total_hutang_keluarga'], 0, ',', '.') ?></span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
-                                    <div class="card-header bg-success bg-opacity-10 py-2 fw-bold text-success small text-uppercase"><i class="bi bi-briefcase-fill me-1"></i> B. Posisi Neraca Produktif / Sektor Usaha</div>
+                                    <div class="card-header bg-success bg-opacity-10 py-2 fw-bold text-success small text-uppercase"><i class="bi bi-briefcase-fill me-1"></i> B. Posisi Keuangan Produktif / Sektor Usaha</div>
                                     <div class="card-body small">
-                                        <h6 class="fw-bold text-success mb-2">Harta / Komoditas Usaha</h6>
+                                        <h6 class="fw-bold text-success mb-2">Harta / Komoditas Produktif Usaha</h6>
                                         <ul class="list-group list-group-flush mb-3">
                                             <?php $has_biz_aset = false; foreach($detail_aset as $ast): if($ast['entitas']=='Usaha'): $has_biz_aset=true; ?>
-                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1">
+                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1 px-0">
                                                     <div><strong><?= htmlspecialchars($ast['nama_aset']) ?></strong> <span class="text-muted d-block" style="font-size:0.75rem;"><?= htmlspecialchars($ast['kondisi_deskripsi']) ?> (<?= $ast['kategori_aset'] ?>)</span></div>
                                                     <span class="fw-bold text-dark">Rp <?= number_format($ast['nilai_pasar'],0,',','.') ?></span>
                                                 </li>
-                                            <?php endif; endforeach; if(!$has_biz_aset): ?><li class="list-group-item text-muted fst-italic text-center">Tidak ada aset usaha produktif yang tercatat</li><?php endif; ?>
+                                            <?php endif; endforeach; if(!$has_biz_aset): ?><li class="list-group-item text-muted fst-italic text-center py-2">Tidak ada aset usaha produktif yang tercatat</li><?php endif; ?>
                                         </ul>
-                                        <h6 class="fw-bold text-danger mb-2">Hutang Modal Kerja Pihak Ketiga</h6>
+                                        <h6 class="fw-bold text-danger mb-2">Hutang Modal Kerja Pihak Ketiga (Luar CU)</h6>
                                         <ul class="list-group list-group-flush">
                                             <?php $has_biz_htg = false; foreach($detail_hutang as $htg): if($htg['entitas']=='Usaha'): $has_biz_htg=true; ?>
-                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1">
+                                                <li class="list-group-item d-flex justify-content-between align-items-start py-1 px-0">
                                                     <div><strong><?= htmlspecialchars($htg['sumber_kreditur']) ?></strong> <span class="text-muted d-block" style="font-size:0.75rem;">Keperluan: <?= htmlspecialchars($htg['tujuan_penggunaan']) ?> | Cicilan: Rp <?= number_format($htg['angsuran_perbulan'],0,',','.') ?>/bln</span></div>
                                                     <span class="fw-bold text-danger">Rp <?= number_format($htg['sisa_outstanding'],0,',','.') ?></span>
                                                 </li>
-                                            <?php endif; endforeach; if(!$has_biz_htg): ?><li class="list-group-item text-muted fst-italic text-center">Bebas beban hutang modal usaha luar</li><?php endif; ?>
+                                            <?php endif; endforeach; if(!$has_biz_htg): ?><li class="list-group-item text-muted fst-italic text-center py-2">Bebas beban hutang modal usaha luar</li><?php endif; ?>
                                         </ul>
-                                        <div class="bg-light p-2 rounded mt-3 d-flex justify-content-between fw-bold border">
-                                            <span>Subtotal Bersih Usaha:</span>
-                                            <span class="text-success">Rp <?= number_format($rapor['total_aset_usaha'] - $rapor['total_hutang_usaha'], 0, ',', '.') ?></span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-calendar-event-fill text-warning me-1"></i> Detail Riwayat Siklus & Model Diversifikasi Usaha</h6>
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-calendar-event text-warning me-2"></i> Siklus Operasional, Skala Produksi & Proyeksi Finansial Komoditas</h6>
                         <div class="row g-3 mb-4">
                             <?php if(!empty($detail_usaha)): foreach($detail_usaha as $ush): ?>
                                 <div class="col-md-6 col-lg-4">
                                     <div class="p-3 bg-white border rounded shadow-sm position-relative">
                                         <span class="position-absolute top-0 end-0 mt-2 me-2 badge bg-secondary"><?= htmlspecialchars($ush['kategori_pekerjaan']) ?></span>
-                                        <h6 class="fw-bold text-dark mb-1 mb-2 pr-5"><?= htmlspecialchars($ush['deskripsi_skala']) ?></h6>
-                                        <div class="small text-muted mb-2">
+                                        <h6 class="fw-bold text-dark mb-2 pr-5 text-truncate" style="font-size:0.95rem;"><?= htmlspecialchars($ush['deskripsi_skala']) ?></h6>
+                                        <div class="small text-muted mb-2" style="font-size:0.8rem;">
                                             <div class="d-flex justify-content-between mb-1"><span>Mulai Siklus:</span> <span class="text-dark fw-bold"><?= format_tgl_lahir($ush['tgl_mulai_siklus']) ?></span></div>
-                                            <div class="d-flex justify-content-between mb-1"><span>Perkiraan Panen:</span> <span class="text-danger fw-bold"><?= format_tgl_lahir($ush['estimasi_tgl_panen']) ?></span></div>
-                                            <div class="border-top pt-1 mt-1"><strong>SOP / Treatment:</strong> <br><span style="font-size:0.8rem;"><?= nl2br(htmlspecialchars($ush['treatment_kegiatan'])) ?: '-' ?></span></div>
+                                            <div class="d-flex justify-content-between mb-1"><span>Perkiraan Waktu Panen:</span> <span class="text-danger fw-bold"><?= format_tgl_lahir($ush['estimasi_tgl_panen']) ?></span></div>
+                                            <div class="border-top pt-1 mt-1"><strong>SOP / Treatment Kegiatan:</strong> <br><span class="text-dark" style="font-size:0.78rem;"><?= nl2br(htmlspecialchars($ush['treatment_kegiatan'])) ?: '-' ?></span></div>
                                         </div>
                                         <div class="border-top pt-2 d-flex justify-content-between align-items-center small">
-                                            <div><span class="d-block text-muted" style="font-size:0.7rem;">Estimasi HPP</span><strong class="text-danger">Rp <?= number_format($ush['estimasi_modal_hpp'],0,',','.') ?></strong></div>
-                                            <div class="text-end"><span class="d-block text-muted" style="font-size:0.7rem;">Proyeksi Omzet</span><strong class="text-success">Rp <?= number_format($ush['estimasi_pendapatan_kotor'],0,',','.') ?></strong></div>
+                                            <div><span class="d-block text-muted" style="font-size:0.7rem;">Estimasi Modal HPP</span><strong class="text-danger">Rp <?= number_format($ush['estimasi_modal_hpp'],0,',','.') ?></strong></div>
+                                            <div class="text-end"><span class="d-block text-muted" style="font-size:0.7rem;">Proyeksi Hasil Kotor</span><strong class="text-success">Rp <?= number_format($ush['estimasi_pendapatan_kotor'],0,',','.') ?></strong></div>
                                         </div>
                                     </div>
                                 </div>
                             <?php endforeach; else: ?>
-                                <div class="col-12"><div class="alert alert-light border text-center small text-muted">Tidak ada siklus komoditas pertanian/peternakan/perdagangan yang tercatat.</div></div>
+                                <div class="col-12"><div class="alert alert-light border text-center small text-muted">Tidak ada siklus usaha agribisnis atau kluster pekerjaan mandiri spesifik yang tercatat.</div></div>
                             <?php endif; ?>
-                        </div>
-
-                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-arrow-left-right text-primary me-1"></i> Rekapitulasi Aliran Kas Konsolidasi (Bulanan)</h6>
-                        <div class="table-responsive shadow-sm border rounded bg-white mb-4">
-                            <table class="table table-bordered mb-0 small table-sm">
-                                <thead class="table-light text-center">
-                                    <tr><th>Arus</th><th>Entitas</th><th>Keterangan Item Arus Kas</th><th class="text-end" width="25%">Nominal Bulanan</th></tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach($detail_cf as $cf): ?>
-                                        <tr>
-                                            <td class="text-center fw-bold text-<?= $cf['tipe_cf']=='Pemasukan'?'success':'danger' ?>"><?= $cf['tipe_cf'] ?></td>
-                                            <td class="text-center"><span class="badge bg-<?= $cf['entitas']=='Keluarga'?'primary':'success' ?>"><?= $cf['entitas'] ?></span></td>
-                                            <td><?= htmlspecialchars($cf['nama_item']) ?></td>
-                                            <td class="text-end fw-bold text-dark">Rp <?= number_format($cf['nominal_bulanan'],0,',','.') ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                                <tfoot class="table-light fw-bold">
-                                    <tr><td colspan="3" class="text-end text-success">Total Pemasukan Konsolidasi:</td><td class="text-end text-success">Rp <?= number_format($rapor['total_pemasukan_cf'],0,',','.') ?></td></tr>
-                                    <tr><td colspan="3" class="text-end text-danger">Total Pengeluaran & Angsuran:</td><td class="text-end text-danger">Rp <?= number_format($rapor['total_pengeluaran_cf'],0,',','.') ?></td></tr>
-                                    <tr class="<?= $rapor['surplus_defisit'] >= 0 ? 'table-success' : 'table-danger' ?>"><td colspan="3" class="text-end text-uppercase">Surplus/Defisit Bersih Riil:</td><td class="text-end fs-6">Rp <?= number_format($rapor['surplus_defisit'],0,',','.') ?></td></tr>
-                                </tfoot>
-                            </table>
                         </div>
 
                         <div class="row g-4 mb-3">
                             <div class="col-md-6">
                                 <div class="p-3 border rounded bg-white shadow-sm h-100 small">
-                                    <h6 class="fw-bold text-danger border-bottom pb-2"><i class="bi bi-heart-pulse-fill me-1"></i> Manajemen Risiko Aktuaria Kesehatan</h6>
+                                    <h6 class="fw-bold text-danger border-bottom pb-2"><i class="bi bi-heart-pulse-fill me-1"></i> Risiko Kesehatan & Jaminan Aktuaria</h6>
                                     <?php if ($detail_kesehatan): ?>
-                                        <div class="mb-1"><strong>Jaminan Kesehatan (BPJS):</strong> <?= $detail_kesehatan['punya_bpjs'] ?> (Kelas: <?= htmlspecialchars($detail_kesehatan['kelas_bpjs_asuransi']) ?: '-' ?>, Premi: Rp <?= number_format($detail_kesehatan['premi_perbulan'],0,',','.') ?>/bln)</div>
-                                        <div class="mb-2"><strong>Asuransi Jiwa Tambahan:</strong> <?= $detail_kesehatan['punya_asuransi_jiwa'] ?> (Nilai UP: <span class="text-success fw-bold">Rp <?= number_format($detail_kesehatan['up_jiwa'],0,',','.') ?></span>)</div>
-                                        <div class="p-2 bg-light border rounded mb-2">
-                                            <div class="mb-1"><strong>Riwayat Sakit Umum (Rata-rata Usia):</strong> <?= htmlspecialchars($detail_kesehatan['riwayat_penyakit_umum']) ?: '-' ?></div>
-                                            <div class="mb-0"><strong>Riwayat Penyakit Kronis/Kritis:</strong> <span class="text-danger fw-bold"><?= htmlspecialchars($detail_kesehatan['riwayat_penyakit_kronis']) ?: 'Tidak Ada' ?></span></div>
+                                        <div class="mb-1"><strong>BPJS / Asuransi Sehat:</strong> <?= $detail_kesehatan['punya_bpjs'] ?> (Kelas: <?= htmlspecialchars($detail_kesehatan['kelas_bpjs_asuransi']) ?: '-' ?>, Premi: Rp <?= number_format($detail_kesehatan['premi_perbulan'],0,',','.') ?>)</div>
+                                        <div class="mb-2"><strong>Proteksi Jiwa:</strong> <?= $detail_kesehatan['punya_asuransi_jiwa'] ?> (Nilai UP: <span class="text-success fw-bold">Rp <?= number_format($detail_kesehatan['up_jiwa'],0,',','.') ?></span>)</div>
+                                        <div class="p-2 bg-light border rounded mb-2" style="font-size:0.8rem;">
+                                            <div class="mb-1"><strong>Penyakit Umum (Faktor Usia):</strong> <?= htmlspecialchars($detail_kesehatan['riwayat_penyakit_umum']) ?: '-' ?></div>
+                                            <div class="mb-0"><strong>Riwayat Kronis/Kritis:</strong> <span class="text-danger fw-bold"><?= htmlspecialchars($detail_kesehatan['riwayat_penyakit_kronis']) ?: 'Tidak Ada' ?></span></div>
                                         </div>
-                                        <div class="alert alert-warning mb-0 border-start border-4 py-1 px-2 fw-bold" style="font-size:0.8rem;"><i class="bi bi-shield-exclamation me-1"></i> Kesimpulan Aktuaris: <?= htmlspecialchars($detail_kesehatan['analisis_coverage']) ?></div>
-                                    <?php else: ?><div class="text-muted fst-italic text-center py-4">Data asuransi belum terisi.</div><?php endif; ?>
+                                        <div class="p-2 bg-warning bg-opacity-10 text-dark border border-warning rounded small fw-bold"><i class="bi bi-shield-exclamation me-1"></i> Evaluasi Risiko: <?= htmlspecialchars($detail_kesehatan['analisis_coverage']) ?></div>
+                                    <?php else: ?><div class="text-muted fst-italic text-center py-4">Data proteksi kesehatan belum diinput.</div><?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="p-3 border rounded bg-white shadow-sm h-100 small">
-                                    <h6 class="fw-bold text-primary border-bottom pb-2"><i class="bi bi-folder-check me-1"></i> Rencana & Kuantifikasi Biaya (RAB Rencana Masa Depan)</h6>
+                                    <h6 class="fw-bold text-primary border-bottom pb-2"><i class="bi bi-folder-check me-1"></i> Target Capaian Harapan & Anggaran Biaya (RAB)</h6>
                                     <ul class="list-group list-group-flush mb-0">
                                         <?php $tot_rab = 0; if(!empty($detail_rab)): foreach($detail_rab as $rb): $tot_rab += (float)$rb['estimasi_biaya']; ?>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center p-1">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center p-1 px-0">
                                                 <div><strong><?= htmlspecialchars($rb['item_rencana']) ?></strong> <span class="badge bg-light text-dark border p-1" style="font-size:0.65rem;"><?= $rb['entitas'] ?></span></div>
                                                 <span class="fw-bold text-primary">Rp <?= number_format($rb['estimasi_biaya'],0,',','.') ?></span>
                                             </li>
                                         <?php endforeach; ?>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light fw-bold p-2 border-top mt-2"><span>Total Plafon Kebutuhan Modal (RAB):</span><span class="text-primary fs-6">Rp <?= number_format($tot_rab,0,',','.') ?></span></li>
-                                        <?php else: ?><li class="list-group-item text-muted text-center py-4">Belum ada poin rencana anggaran biaya (RAB) yang dicatat.</li><?php endif; ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light fw-bold p-2 border-top mt-2"><span>Total Plafon Kebutuhan RAB:</span><span class="text-primary fs-6">Rp <?= number_format($tot_rab,0,',','.') ?></span></li>
+                                        <?php else: ?><li class="list-group-item text-muted text-center py-4">Belum ada poin kuantifikasi anggaran biaya (RAB) rencana masa depan.</li><?php endif; ?>
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="alert alert-warning mb-0 border-start border-4 small mt-4 shadow-sm bg-white">
-                            <h6 class="fw-bold mb-1"><i class="bi bi-chat-left-text-fill"></i> Narasi Sosial & Rekomendasi Tertulis Petugas Lapangan</h6>
-                            <p class="mb-2 text-muted"><strong>Kondisi Fisik Rumah:</strong> <?= nl2br(htmlspecialchars($m_latest['kondisi_rumah_aset'])) ?: '-' ?></p>
-                            <p class="mb-2 text-muted"><strong>Kondisi Gejala Sosial & Warga:</strong> Keluarga: <?= htmlspecialchars($m_latest['keharmonisan_keluarga']) ?> | Relasi Warga: <?= htmlspecialchars($m_latest['relasi_sosial_warga']) ?></p>
-                            <div class="p-2 border rounded bg-light text-dark fw-bold"><i class="bi bi-lightbulb-fill text-warning me-1"></i> Rekomendasi/Langkah Intervensi LOS: <?= nl2br(htmlspecialchars($m_latest['kesimpulan_rekomendasi'])) ?></div>
-                        </div>
-
                     <?php else: ?>
                         <div class="alert alert-light border shadow-sm py-5 text-center">
                             <i class="bi bi-clipboard2-x fs-1 d-block mb-3 text-secondary opacity-50"></i>
-                            <h5 class="fw-bold">Belum Ada Riwayat Kunjungan / Lembar Appraisal</h5>
-                            <p class="mb-0 text-muted small">Anggota ini belum memiliki data survei terstruktur. Silakan tambahkan instrumen appraisal baru.</p>
+                            <h5 class="fw-bold">Belum Ada Histori Profiling Lapangan</h5>
+                            <p class="mb-0 text-muted small">Anggota ini belum memiliki data survei terstruktur. Silakan agendakan kunjungan pendampingan pertama.</p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -654,7 +640,7 @@
                     <div class="card bg-<?= $warna_diklat ?> bg-opacity-10 border-<?= $warna_diklat ?> mb-4 shadow-sm">
                         <div class="card-body py-3 d-flex flex-wrap justify-content-between align-items-center">
                             <div><h6 class="fw-bold text-<?= $warna_diklat ?> mb-1"><i class="bi bi-shield-check me-2"></i> Parameter Filter Rekrutmen (Syarat Mutlak)</h6><div class="small text-muted">Anggota diwajibkan lulus setidaknya <strong>Pendidikan Dasar CU (4 Kuadran)</strong>.</div></div>
-                            <div class="text-md-end mt-2 mt-md-0"><?= $lulus_dikdas ? '<span class="badge bg-success fs-6 p-2">Lulus Syarat Minimal (Skor: '.$total_skor_diklat.')</span>' : '<span class="badge bg-danger fs-6 p-2">Belum Lulus Syarat Minimal</span>' ?></div>
+                            <div class="text-md-end mt-2 mt-md-0"><?= $lulus_dikdas ? '<span class="badge bg-success fs-6 p-2">Lulus Syarat Minimal (Skor: '.$total_skor_diklat.')</span>' : '<span class="badge bg-danger fs-6 p-2">Belum Lunas Syarat Minimal</span>' ?></div>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -706,7 +692,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="bi bi-house-door-fill me-2"></i> Form Instrumen Kunjungan & Lembar Appraisal LOS</h5>
+                <h5 class="modal-title"><i class="bi bi-journal-check me-2"></i> Pengisian Instrumen Kunjungan & Profiling Sosial Ekonomi</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="profil.php?no_ba=<?= urlencode($no_ba) ?>" method="POST">
@@ -715,131 +701,131 @@
                 <div class="modal-body p-0 bg-light">
                     <ul class="nav nav-tabs nav-fill bg-white border-bottom pt-2 px-2" id="surveiTabs" role="tablist">
                         <li class="nav-item"><button class="nav-link active fw-bold small" data-bs-toggle="tab" data-bs-target="#sm-umum" type="button">1. Profil & Kesehatan</button></li>
-                        <li class="nav-item"><button class="nav-link fw-bold text-primary small" data-bs-toggle="tab" data-bs-target="#sm-aset" type="button">2. Appraisal Aset (+)</button></li>
-                        <li class="nav-item"><button class="nav-link fw-bold text-danger small" data-bs-toggle="tab" data-bs-target="#sm-hutang" type="button">3. Beban Hutang Luar (+)</button></li>
-                        <li class="nav-item"><button class="nav-link fw-bold text-success small" data-bs-toggle="tab" data-bs-target="#sm-cashflow" type="button">4. Aliran Arus Kas (+)</button></li>
+                        <li class="nav-item"><button class="nav-link fw-bold text-primary small" data-bs-toggle="tab" data-bs-target="#sm-aset" type="button">2. Harta Aset Anggota (+)</button></li>
+                        <li class="nav-item"><button class="nav-link fw-bold text-danger small" data-bs-toggle="tab" data-bs-target="#sm-hutang" type="button">3. Hutang Luar (+)</button></li>
+                        <li class="nav-item"><button class="nav-link fw-bold text-success small" data-bs-toggle="tab" data-bs-target="#sm-cashflow" type="button">4. Aliran Kas Bulanan (+)</button></li>
                         <li class="nav-item"><button class="nav-link fw-bold text-warning small" data-bs-toggle="tab" data-bs-target="#sm-usaha" type="button">5. Siklus Multi-Usaha (+)</button></li>
-                        <li class="nav-item"><button class="nav-link fw-bold text-info small" data-bs-toggle="tab" data-bs-target="#sm-rab" type="button">6. Poin RAB Rencana (+)</button></li>
+                        <li class="nav-item"><button class="nav-link fw-bold text-info small" data-bs-toggle="tab" data-bs-target="#sm-rab" type="button">6. Poin RAB Harapan (+)</button></li>
                     </ul>
 
-                    <div class="tab-content p-4" style="max-height: 60vh; overflow-y: auto;">
+                    <div class="tab-content p-4" style="max-height: 55vh; overflow-y: auto;">
                         
                         <div class="tab-pane fade show active" id="sm-umum">
                             <div class="row g-3 mb-3">
-                                <div class="col-md-6"><label class="form-label small fw-bold">Tgl Survei *</label><input type="date" class="form-control" name="tgl_survei" value="<?= date('Y-m-d') ?>" required></div>
-                                <div class="col-md-6"><label class="form-label small fw-bold">Nama Surveyor / Petugas Lapangan *</label><input type="text" class="form-control" name="nama_petugas" required placeholder="Ketik nama pemeriksa"></div>
+                                <div class="col-md-6"><label class="form-label small fw-bold">Tanggal Agenda Kunjungan *</label><input type="date" class="form-control" name="tgl_survei" value="<?= date('Y-m-d') ?>" required></div>
+                                <div class="col-md-6"><label class="form-label small fw-bold">Nama Petugas Pendamping / Fasilitator *</label><input type="text" class="form-control" name="nama_petugas" required placeholder="Nama lengkap petugas"></div>
                             </div>
-                            <div class="mb-3"><label class="form-label small fw-bold">Kondisi Kelayakan Rumah Tinggal & Atribut Fisik</label><textarea class="form-control" name="kondisi_rumah_aset" rows="2" placeholder="Deskripsikan luas lahan, dinding, atap, status milik sendiri/sewa..."></textarea></div>
+                            <div class="mb-3"><label class="form-label small fw-bold">Kondisi Kelayakan Tempat Tinggal & Atribut Fisik</label><textarea class="form-control" name="kondisi_rumah_aset" rows="2" placeholder="Contoh: Luas bangunan, status kepemilikan tanah, kelayakan sanitasi..."></textarea></div>
                             <div class="row g-3 mb-3">
-                                <div class="col-md-6"><label class="form-label small fw-bold">Keharmonisan Keluarga</label><select class="form-select" name="keharmonisan_keluarga"><option value="Sangat Harmonis">Sangat Harmonis</option><option value="Cukup Harmonis" selected>Cukup Harmonis</option><option value="Rentan Konflik / Retak">Rentan Konflik / Retak</option></select></div>
-                                <div class="col-md-6"><label class="form-label small fw-bold">Relasi Sosial Masyarakat & Kegiatan Warga</label><input type="text" class="form-control" name="relasi_sosial_warga" placeholder="Contoh: Pengurus RT, anggota tahlilan, warga biasa"></div>
+                                <div class="col-md-6"><label class="form-label small fw-bold">Tingkat Hubungan / Keharmonisan Domestik Keluarga</label><select class="form-select" name="keharmonisan_keluarga"><option value="Sangat Harmonis">Sangat Harmonis</option><option value="Cukup Harmonis" selected>Cukup Harmonis</option><option value="Rentan Konflik">Rentan Konflik / Retak</option></select></div>
+                                <div class="col-md-6"><label class="form-label small fw-bold">Keterlibatan Sosial / Ketokohan di Lingkungan Warga</label><input type="text" class="form-control" name="relasi_social_warga" placeholder="Contoh: Pengurus warga, anggota PKK, kelompok tani, warga biasa"></div>
                             </div>
                             
                             <div class="p-3 border rounded bg-white mt-4">
-                                <h6 class="fw-bold text-danger border-bottom pb-2 mb-2"><i class="bi bi-heart-pulse"></i> Parameter Analisis Risiko Kesehatan Bulanan</h6>
+                                <h6 class="fw-bold text-danger border-bottom pb-2 mb-2"><i class="bi bi-heart-pulse-fill"></i> Manajemen Risiko Kesehatan & Jaminan Proteksi Aktuaria</h6>
                                 <div class="row g-3 mb-2">
-                                    <div class="col-md-4"><label class="form-label small fw-bold">Memiliki BPJS / Asuransi Sehat</label><select class="form-select" name="kes_bpjs"><option value="Ya" selected>Ya</option><option value="Tidak">Tidak</option></select></div>
-                                    <div class="col-md-4"><label class="form-label small fw-bold">Kelas BPJS / Jenis Produk</label><input type="text" class="form-control" name="kes_kelas" placeholder="Contoh: Kelas 2 / Mandiri Inhealth"></div>
-                                    <div class="col-md-4"><label class="form-label small fw-bold">Beban Premi Bulanan</label><div class="input-group"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="kes_premi" placeholder="0"></div></div>
+                                    <div class="col-md-4"><label class="form-label small fw-bold">Tercover Jaminan (BPJS/Kesihatan)</label><select class="form-select" name="kes_bpjs"><option value="Ya" selected>Ya</option><option value="Tidak">Tidak</option></select></div>
+                                    <div class="col-md-4"><label class="form-label small fw-bold">Kelas Fasilitas / Nama Layanan</label><input type="text" class="form-control" name="kes_kelas" placeholder="Contoh: BPJS Mandiri Kelas 2 / KIS PBI"></div>
+                                    <div class="col-md-4"><label class="form-label small fw-bold">Besaran Premi per Bulan</label><div class="input-group input-group-sm"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="kes_premi" placeholder="0"></div></div>
                                 </div>
                                 <div class="row g-3 mb-3">
-                                    <div class="col-md-4"><label class="form-label small fw-bold">Memiliki Asuransi Jiwa Tambahan</label><select class="form-select" name="kes_jiwa"><option value="Ya">Ya (Nilai Plus Kredit)</option><option value="Tidak" selected>Tidak</option></select></div>
-                                    <div class="col-md-8"><label class="form-label small fw-bold">Nilai Uang Pertanggungan (UP) Jiwa</label><div class="input-group"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="kes_up" placeholder="0"></div></div>
+                                    <div class="col-md-4"><label class="form-label small fw-bold">Memiliki Polis Proteksi Jiwa Tambahan</label><select class="form-select" name="kes_jiwa"><option value="Ya">Ya</option><option value="Tidak" selected>Tidak</option></select></div>
+                                    <div class="col-md-8"><label class="form-label small fw-bold">Nominal Uang Pertanggungan (UP) Polis Jiwa</label><div class="input-group input-group-sm"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="kes_up" placeholder="0"></div></div>
                                 </div>
                                 <div class="row g-3">
-                                    <div class="col-md-6"><label class="form-label small fw-bold">Kelompok Penyakit Umum (Rata-rata Usia / Ringan)</label><input type="text" class="form-control" name="kes_umum" placeholder="Contoh: Flu, maag, pusing musiman"></div>
-                                    <div class="col-md-6"><label class="form-label small fw-bold text-danger">Kelompok Penyakit Kronis / Kritis (Beban Finansial Tinggi)</label><input type="text" class="form-control border-danger" name="kes_kronis" placeholder="Contoh: Diabetes, Jantung, Stroke, Asma Menahun (Kosongkan jika sehat)"></div>
+                                    <div class="col-md-6"><label class="form-label small fw-bold">Kelompok Gejala/Penyakit Umum (Sesuai Rata-rata Usia)</label><input type="text" class="form-control" name="kes_umum" placeholder="Contoh: Flu musiman, kelelahan, maag ringan"></div>
+                                    <div class="col-md-6"><label class="form-label small fw-bold text-danger">Kelompok Penyakit Kronis / Kritis (Beban Biaya Tinggi)</label><input type="text" class="form-control border-danger" name="kes_kronis" placeholder="Contoh: Hipertensi, Asma menahun, Jantung koroner (Kosongkan jika sehat)"></div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="tab-pane fade" id="sm-aset">
-                            <div class="alert alert-primary py-2 small mb-3"><i class="bi bi-info-circle-fill"></i> Tambah semua kepemilikan aset riil anggota satu per satu untuk menyusun laporan posisi Neraca secara otomatis.</div>
+                            <div class="alert alert-primary py-1 small mb-3"><i class="bi bi-info-circle-fill"></i> Daftarkan seluruh instrumen harta berharga anggota satu per satu secara detail.</div>
                             <div id="wrapper-aset">
                                 <div class="row g-2 mb-2 p-2 border rounded bg-white item-row-aset">
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Entitas Pemilik</label><select class="form-select form-select-sm" name="aset_entitas[]"><option value="Keluarga">Keluarga (Konsumtif)</option><option value="Usaha">Usaha (Produktif/Modal)</option></select></div>
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Kategori Harta</label><select class="form-select form-select-sm" name="aset_kategori[]"><option value="Aset Lancar (Kas/Tabungan)">Aset Lancar (Kas/Tabungan Bank Luar)</option><option value="Aset Tetap (Tanah/Rumah)">Aset Tetap (Tanah/Rumah)</option><option value="Kendaraan">Kendaraan (Motor/Mobil)</option><option value="Peralatan/Mesin">Peralatan/Mesin Kerja</option><option value="Stok Barang/Ternak">Stok Barang / Hewan Ternak</option></select></div>
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Nama Barang / Judul Aset</label><input type="text" class="form-control form-control-sm" name="aset_nama[]" placeholder="Contoh: Motor Honda Beat 2022"></div>
-                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Nilai Taksasi Pasar</label><input type="text" class="form-control form-control-sm currency-input input-hitung-aset" name="aset_nilai[]" placeholder="0"></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Pemanfaatan Sifat</label><select class="form-select form-select-sm" name="aset_entitas[]"><option value="Keluarga">Keluarga (Konsumtif / Rumah Tangga)</option><option value="Usaha">Usaha (Produktif / Sumber Income)</option></select></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Kategori Klasifikasi</label><select class="form-select form-select-sm" name="aset_kategori[]"><option value="Aset Lancar (Kas/Tabungan)">Aset Lancar (Kas / Tabungan Bank Luar)</option><option value="Aset Tetap (Tanah/Rumah)">Aset Tetap (Tanah / Bangunan)</option><option value="Kendaraan">Kendaraan Bermotor</option><option value="Peralatan/Mesin">Peralatan / Mesin Kerja</option><option value="Stok Barang/Ternak">Stok Barang / Inventaris / Hewan Ternak</option></select></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Nama Judul Harta Aset</label><input type="text" class="form-control form-control-sm" name="aset_nama[]" placeholder="Contoh: Mobil Pick-Up L300 2019"></div>
+                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Nilai Pasar / Taksasi</label><input type="text" class="form-control form-control-sm currency-input" name="aset_nilai[]" placeholder="0"></div>
                                     <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-sm btn-danger w-100 btn-remove-row" style="display:none;"><i class="bi bi-trash"></i></button></div>
-                                    <div class="col-12 mt-1"><input type="text" class="form-control form-control-sm" name="aset_kondisi[]" placeholder="Tulis deskripsi detail menceritakan kondisi fisik & bukti kepemilikan aset..."></div>
+                                    <div class="col-12 mt-1"><input type="text" class="form-control form-control-sm" name="aset_kondisi[]" placeholder="Tuliskan deskripsi detail naratif mengenai kondisi kelayakan fisik barang saat ini..."></div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="btn-tambah-aset"><i class="bi bi-plus-circle"></i> Tambah Baris Aset Baru</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="btn-tambah-aset"><i class="bi bi-plus-circle"></i> Tambah Item Aset Baru</button>
                         </div>
 
                         <div class="tab-pane fade" id="sm-hutang">
-                            <div class="alert alert-danger py-2 small mb-3"><i class="bi bi-exclamation-triangle-fill"></i> Catat seluruh beban pinjaman anggota di tempat luar (Bank, Leasing, Pegadaian, Pinjol) sebagai pengurang likuiditas kredit.</div>
+                            <div class="alert alert-danger py-1 small mb-3"><i class="bi bi-exclamation-triangle-fill"></i> Catat komitmen beban keuangan anggota di pihak ketiga/lembaga luar (Bank, Leasing, Pegadaian, Pinjol).</div>
                             <div id="wrapper-hutang">
                                 <div class="row g-2 mb-2 p-2 border rounded bg-white item-row-hutang">
-                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Jenis Sifat</label><select class="form-select form-select-sm" name="hutang_entitas[]"><option value="Keluarga">Hutang Konsumtif</option><option value="Usaha">Hutang Produktif Usaha</option></select></div>
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Nama Kreditur Lembaga Luar</label><input type="text" class="form-control form-control-sm" name="hutang_sumber[]" placeholder="Contoh: Bank BRI / FIF Leasing"></div>
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Tujuan Penggunaan Dana</label><input type="text" class="form-control form-control-sm" name="hutang_tujuan[]" placeholder="Contoh: Sisa Kredit Motor / Modal Pupuk"></div>
-                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Sisa O/S Pokok</label><input type="text" class="form-control form-control-sm currency-input" name="hutang_sisa[]" placeholder="0"></div>
+                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Sifat Alokasi</label><select class="form-select form-select-sm" name="hutang_entitas[]"><option value="Keluarga">Konsumtif (Keluarga)</option><option value="Usaha">Produktif (Modal Usaha)</option></select></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Nama Lembaga Kreditur / Pihak Ketiga</label><input type="text" class="form-control form-control-sm" name="hutang_sumber[]" placeholder="Contoh: Bank BRI / Leasing Adira"></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Tujuan / Keperluan Mengambil Kredit</label><input type="text" class="form-control form-control-sm" name="hutang_tujuan[]" placeholder="Contoh: Pinjaman Pupuk / Kredit Motor"></div>
+                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Sisa Sisa Outstanding</label><input type="text" class="form-control form-control-sm currency-input" name="hutang_sisa[]" placeholder="0"></div>
                                     <div class="col-md-1"><label class="form-label small text-muted mb-1">Cicilan / Bln</label><input type="text" class="form-control form-control-sm currency-input" name="hutang_angsuran[]" placeholder="0"></div>
                                     <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-sm btn-danger w-100 btn-remove-row" style="display:none;"><i class="bi bi-trash"></i></button></div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="btn-tambah-hutang"><i class="bi bi-plus-circle"></i> Tambah Baris Hutang Luar</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="btn-tambah-hutang"><i class="bi bi-plus-circle"></i> Tambah Item Hutang Pihak Luar</button>
                         </div>
 
                         <div class="tab-pane fade" id="sm-cashflow">
-                            <div class="alert alert-success py-2 small mb-3"><i class="bi bi-cash-stack"></i> Rincian Arus Kas Bulanan Tetap. Pisahkan item pendapatan (Gaji/Omzet) dengan pengeluaran (Biaya Makan/Operasional Usaha) untuk mengukur kapasitas laba bersih.</div>
+                            <div class="alert alert-success py-1 small mb-3"><i class="bi bi-cash-stack"></i> Rincian Arus Kas Tetap bulanan. Masukkan semua komponen pemasukan berkala (gaji/omzet) vs pengeluaran rutin (biaya hidup/biaya operasional).</div>
                             <div id="wrapper-cf">
                                 <div class="row g-2 mb-2 p-2 border rounded bg-white item-row-cf">
-                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Jenis Aliran</label><select class="form-select form-select-sm" name="cf_tipe[]"><option value="Pemasukan">Pemasukan (In)</option><option value="Pengeluaran">Pengeluaran (Out)</option></select></div>
-                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Entitas Kantong</label><select class="form-select form-select-sm" name="cf_entitas[]"><option value="Keluarga">Dompet Keluarga</option><option value="Usaha">Operasional Usaha</option></select></div>
-                                    <div class="col-md-5"><label class="form-label small text-muted mb-1">Nama Item Komponen Arus Kas</label><input type="text" class="form-control form-control-sm" name="cf_nama[]" placeholder="Contoh: Gaji Pokok, Hasil Dagang Sembako, Biaya Sekolah Anak, Belanja Bahan Baku"></div>
+                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Arah Arus</label><select class="form-select form-select-sm" name="cf_tipe[]"><option value="Pemasukan">Pemasukan (Cash In)</option><option value="Pengeluaran">Pengeluaran (Cash Out)</option></select></div>
+                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Entitas Kantong</label><select class="form-select form-select-sm" name="cf_entitas[]"><option value="Keluarga">Dompet Rumah Tangga</option><option value="Usaha">Kas Operasional Usaha</option></select></div>
+                                    <div class="col-md-5"><label class="form-label small text-muted mb-1">Nama Item Keterangan Arus Kas Bulanan</label><input type="text" class="form-control form-control-sm" name="cf_nama[]" placeholder="Contoh: Gaji bulanan istri, Hasil omzet warung sembako, Belanja dapur, Biaya pakan ternak harian"></div>
                                     <div class="col-md-2"><label class="form-label small text-muted mb-1">Nominal per Bulan</label><input type="text" class="form-control form-control-sm currency-input" name="cf_nominal[]" placeholder="0"></div>
                                     <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-sm btn-danger w-100 btn-remove-row" style="display:none;"><i class="bi bi-trash"></i></button></div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-success mt-2" id="btn-tambah-cf"><i class="bi bi-plus-circle"></i> Tambah Item Komponen Kas</button>
+                            <button type="button" class="btn btn-sm btn-outline-success mt-2" id="btn-tambah-cf"><i class="bi bi-plus-circle"></i> Tambah Item Arus Kas</button>
                         </div>
 
                         <div class="tab-pane fade" id="sm-usaha">
-                            <div class="alert alert-warning py-2 small mb-3 text-dark"><i class="bi bi-brightness-high-fill"></i> Modul Manajemen Siklus Usaha: Cocok untuk pemetaan komoditas musiman (Petani Bawang, Peternak Sapi, Pedagang, Karyawan Kontrak) guna memprediksi modal HPP dan waktu jatuh tempo panen.</div>
+                            <div class="alert alert-warning py-1 small mb-3 text-dark"><i class="bi bi-graph-up"></i> Petakan siklus produksi musiman / model penopang pendapatan anggota secara komprehensif.</div>
                             <div id="wrapper-usaha">
                                 <div class="row g-2 mb-3 p-3 border rounded bg-white item-row-usaha">
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Kategori Kluster Usaha</label><select class="form-select form-select-sm" name="usaha_kategori[]"><option value="Petani">Sektor Agraria / Petani</option><option value="Peternak">Sektor Peternakan</option><option value="Pedagang">Sektor Perdagangan / Jasa</option><option value="Karyawan">Sektor Karyawan / Buruh</option></select></div>
-                                    <div class="col-md-6"><label class="form-label small text-muted mb-1">Skala Cakupan / Deskripsi Luas Lahan / Komoditas</label><input type="text" class="form-control form-control-sm" name="usaha_deskripsi[]" placeholder="Contoh: Bertani Bawang Merah Lahan 5000m2 / Penggemukan 5 Ekor Sapi"></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Kluster Model Usaha</label><select class="form-select form-select-sm" name="usaha_kategori[]"><option value="Petani">Sektor Agraria / Pertanian</option><option value="Peternak">Sektor Peternakan</option><option value="Pedagang">Sektor Perdagangan / Jasa</option><option value="Karyawan">Sektor Karyawan / Buruh Tani</option></select></div>
+                                    <div class="col-md-6"><label class="form-label small text-muted mb-1">Skala Cakupan / Deskripsi Luas Lahan / Komoditas</label><input type="text" class="form-control form-control-sm" name="usaha_deskripsi[]" placeholder="Contoh: Sawah Bawang Merah Luas 4000m2 / Budidaya Gurami 3 Kolam"></div>
                                     <div class="col-md-2"><label class="form-label small text-muted mb-1">Mulai Tanam/Kerja</label><input type="date" class="form-control form-control-sm" name="usaha_tgl_mulai[]"></div>
                                     <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-sm btn-danger w-100 btn-remove-row" style="display:none;"><i class="bi bi-trash"></i></button></div>
                                     
-                                    <div class="col-md-12 mt-1"><input type="text" class="form-control form-control-sm" name="usaha_treatment[]" placeholder="Ketik rincian intervensi / treatment berkala (Contoh: Pola pupuk urea tahap 1 & 2, suntik vaksin berkala, kulakan grosir rutin)..."></div>
+                                    <div class="col-md-12 mt-1"><input type="text" class="form-control form-control-sm" name="usaha_treatment[]" placeholder="Ketik rincian perlakuan / pola treatment berkala (Contoh: Skema pupuk subsidi, jadwal vaksinasi, sistem kulakan mingguan)..."></div>
                                     
-                                    <div class="col-md-4 mt-2"><label class="form-label small text-muted mb-0" style="font-size:0.75rem;">Total Kebutuhan Modal Kerja (HPP)</label><div class="input-group input-group-sm"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="usaha_modal[]" placeholder="0"></div></div>
-                                    <div class="col-md-4 mt-2"><label class="form-label small text-muted mb-0" style="font-size:0.75rem;">Estimasi Perkiraan Waktu Panen</label><input type="date" class="form-control form-control-sm" name="usaha_tgl_panen[]"></div>
-                                    <div class="col-md-4 mt-2"><label class="form-label small text-muted mb-0" style="font-size:0.75rem;">Estimasi Pendapatan Kotor (Omzet Panen)</label><div class="input-group input-group-sm"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="usaha_pendapatan[]" placeholder="0"></div></div>
+                                    <div class="col-md-4 mt-2"><label class="form-label small text-muted mb-0" style="font-size:0.75rem;">Total Kebutuhan Modal Kerja per Siklus (HPP)</label><div class="input-group input-group-sm"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="usaha_modal[]" placeholder="0"></div></div>
+                                    <div class="col-md-4 mt-2"><label class="form-label small text-muted mb-0" style="font-size:0.75rem;">Estimasi Perkiraan Tanggal Panen</label><input type="date" class="form-control form-control-sm" name="usaha_tgl_panen[]"></div>
+                                    <div class="col-md-4 mt-2"><label class="form-label small text-muted mb-0" style="font-size:0.75rem;">Estimasi Omzet Kotor (Hasil Penjualan Panen)</label><div class="input-group input-group-sm"><span class="input-group-text">Rp</span><input type="text" class="form-control currency-input" name="usaha_pendapatan[]" placeholder="0"></div></div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-warning text-dark mt-1" id="btn-tambah-usaha"><i class="bi bi-plus-circle"></i> Tambah Kluster Siklus Kerja Baru</button>
+                            <button type="button" class="btn btn-sm btn-outline-warning text-dark mt-1" id="btn-tambah-usaha"><i class="bi bi-plus-circle"></i> Tambah Sektor Usaha/Siklus Baru</button>
                         </div>
 
                         <div class="tab-pane fade" id="sm-rab">
-                            <div class="alert alert-info py-2 small mb-3"><i class="bi bi-file-earmark-spreadsheet"></i> Kuantifikasi Harapan Anggota (RAB). Masukkan rencana berbiaya baik untuk renovasi rumah, modal ekspansi usaha, maupun dana pendidikan anak.</div>
+                            <div class="alert alert-info py-1 small mb-3"><i class="bi bi-journal-text"></i> Transformasikan harapan dan rencana masa depan anggota ke dalam instrumen target biaya (RAB Rencana Tindak Lanjut).</div>
                             <div id="wrapper-rab">
                                 <div class="row g-2 mb-2 p-2 border rounded bg-white item-row-rab">
-                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Sifat Keperluan</label><select class="form-select form-select-sm" name="rab_entitas[]"><option value="Keluarga">RAB Renovasi / Domestik Keluarga</option><option value="Usaha">RAB Pengembangan Ekspansi Usaha</option></select></div>
-                                    <div class="col-md-6"><label class="form-label small text-muted mb-1">Item Rencana Tindak Lanjut / Harapan Mendesak</label><input type="text" class="form-control form-control-sm" name="rab_item[]" placeholder="Contoh: Pembelian Traktor Mini Diesel / Biaya Masuk Kuliah Anak Pertama"></div>
-                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Estimasi Kebutuhan Biaya</label><input type="text" class="form-control form-control-sm currency-input" name="rab_biaya[]" placeholder="0"></div>
+                                    <div class="col-md-3"><label class="form-label small text-muted mb-1">Kategori Kepentingan</label><select class="form-select form-select-sm" name="rab_entitas[]"><option value="Keluarga">RAB Kebutuhan Domestik Keluarga</option><option value="Usaha">RAB Rencana Ekspansi Kapasitas Usaha</option></select></div>
+                                    <div class="col-md-6"><label class="form-label small text-muted mb-1">Item Deskripsi Rencana Masa Depan Anggota</label><input type="text" class="form-control form-control-sm" name="rab_item[]" placeholder="Contoh: Renovasi atap genteng, Beli mesin penggiling diesel, Biaya masuk universitas anak"></div>
+                                    <div class="col-md-2"><label class="form-label small text-muted mb-1">Estimasi Kebutuhan Dana</label><input type="text" class="form-control form-control-sm currency-input" name="rab_biaya[]" placeholder="0"></div>
                                     <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-sm btn-danger w-100 btn-remove-row" style="display:none;"><i class="bi bi-trash"></i></button></div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-info text-dark mt-2" id="btn-tambah-rab"><i class="bi bi-plus-circle"></i> Tambah Poin Usulan RAB</button>
+                            <button type="button" class="btn btn-sm btn-outline-info text-dark mt-2" id="btn-tambah-rab"><i class="bi bi-plus-circle"></i> Tambah Poin Rencana Anggaran (RAB)</button>
                         </div>
 
                     </div>
                     
                     <div class="p-4 bg-white border-top">
-                        <label class="form-label small fw-bold text-success"><i class="bi bi-check-square"></i> Kesimpulan Kelayakan Hasil Analisis Lapangan & Langkah Rekomendasi Petugas (Wajib) *</label>
-                        <textarea class="form-control border-success" name="rekomendasi_petugas" rows="3" placeholder="Tulis ringkasan keputusan analis: Mengapa anggota ini layak/tidak layak, bagaimana mitigasi risikonya, serta skema kredit yang disarankan..." required></textarea>
+                        <label class="form-label small fw-bold text-success"><i class="bi bi-chat-text"></i> Arahan Rekomendasi Bentuk Pendampingan Mentor & Solusi Pengembangan Anggota ke Depan (Wajib) *</label>
+                        <textarea class="form-control border-success" name="rekomendasi_petugas" rows="3" placeholder="Tulis catatan pendampingan: Cara meningkatkan produksi, mitigasi risiko kesehatan, penyelesaian poin RAB, atau rekomendasi opsi pinjaman CU jika dibutuhkan..." required></textarea>
                     </div>
                 </div>
                 
                 <div class="modal-footer bg-light border-top">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success"><i class="bi bi-cloud-arrow-up-fill"></i> Simpan & Eksekusi Lembar Appraisal</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-cloud-arrow-up-fill"></i> Simpan Hasil Profiling</button>
                 </div>
             </form>
         </div>
@@ -939,7 +925,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
-    // SCRIPT UTAMA UNTUK EVENT TAMBAH / CLONE NODE DINAMIS FORM SURVEI
+    // MEKANISME UTAMA TAMBAH / HAPUS ROW DINAMIS BERLURUSAN NODE CLONING
     function initDynamicRowEngine(btnId, wrapperId, rowClass) {
         const btnAdd = document.getElementById(btnId);
         const wrapper = document.getElementById(wrapperId);
@@ -947,14 +933,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!btnAdd || !wrapper) return;
 
         btnAdd.addEventListener('click', function() {
-            // Ambil row pertama sebagai blueprint cetakan
             const rows = wrapper.getElementsByClassName(rowClass);
             if (rows.length === 0) return;
 
             const blueprint = rows[0];
             const newRow = blueprint.cloneNode(true);
 
-            // Bersihkan isi seluruh input/textarea di baris baru
+            // Bersihkan isi nilai input baris baru
             const inputs = newRow.querySelectorAll('input, textarea, select');
             inputs.forEach(input => {
                 if (input.tagName === 'SELECT') {
@@ -964,7 +949,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Tampilkan tombol hapus berkode merah di baris baru
+            // Aktifkan tombol hapus pada baris tambahan baru
             const btnRemove = newRow.querySelector('.btn-remove-row');
             if (btnRemove) {
                 btnRemove.style.display = 'block';
@@ -973,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
 
-            // Daftarkan ulang listener format rupiah untuk field mata uang di baris baru
+            // Pasangkan ulang format mata uang pada baris baru
             const currencyInputs = newRow.querySelectorAll('.currency-input');
             currencyInputs.forEach(input => {
                 bindRupiahFormatter(input);
@@ -982,7 +967,7 @@ document.addEventListener('DOMContentLoaded', function() {
             wrapper.appendChild(newRow);
         });
 
-        // Daftarkan listener hapus untuk baris bawaan jika nanti dikloning banyak
+        // Event listener hapus bawaan baris pertama
         const initialRemoveBtn = wrapper.querySelector('.' + rowClass + ' .btn-remove-row');
         if (initialRemoveBtn) {
             initialRemoveBtn.addEventListener('click', function() {
@@ -994,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // FUNGSI STANDAR FORMAT RUPIAH VANILLA JS
+    // FUNCTION FORMAT RUPIAH MASKING
     function bindRupiahFormatter(input) {
         input.addEventListener('keyup', function(e) {
             let value = this.value.replace(/[^,\d]/g, '').toString();
@@ -1010,20 +995,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // EKSEKUSI LISTENERS FORM DINAMIS UNTUK KE-5 COMPONENT TAB 5
+    // LOAD ENGINE COMPONENT UNTUK FORM TAB 5
     initDynamicRowEngine('btn-tambah-aset', 'wrapper-aset', 'item-row-aset');
     initDynamicRowEngine('btn-tambah-hutang', 'wrapper-hutang', 'item-row-hutang');
     initDynamicRowEngine('btn-tambah-cf', 'wrapper-cf', 'item-row-cf');
     initDynamicRowEngine('btn-tambah-usaha', 'wrapper-usaha', 'item-row-usaha');
     initDynamicRowEngine('btn-tambah-rab', 'wrapper-rab', 'item-row-rab');
 
-    // Ikat formatter rupiah awal untuk semua input yang sudah ada di halaman saat render
+    // Ikat formating awal rupiah
     const initialCurrencies = document.querySelectorAll('.currency-input');
     initialCurrencies.forEach(input => {
         bindRupiahFormatter(input);
     });
 
-    // SCRIPT SAKLAR FILTER STATUS PORTOFOLIO KEUANGAN (TAB 3)
+    // SAKLAR FILTER STATUS PORTOFOLIO (TAB 3)
     const filterRadios = document.querySelectorAll('.filter-radio');
     const portoItems = document.querySelectorAll('.porto-item');
     filterRadios.forEach(radio => {

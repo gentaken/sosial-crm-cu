@@ -1,5 +1,5 @@
 <?php
-// public/profil.php - Logika Detail Anggota, DMS, & Executive Summary Rapor (LOS Version)
+// public/profil.php - Logika Detail Anggota, DMS, LOS, & Narasi Pendampingan
 session_start();
 
 require_once '../config/database.php';
@@ -56,71 +56,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
     
-    // Action Tambah Profiling & Survei Holistik (VERSI RELASIONAL LOS)
+    // Action Tambah Profiling & Survei Holistik
     if ($_POST['action'] == 'tambah_profiling') {
         try {
-            // Gunakan Transaction karena insert ke banyak tabel
             $pdo_lokal->beginTransaction();
 
-            // 1. Insert Master Survei
             $stmt_master = $pdo_lokal->prepare("
                 INSERT INTO t_survei_master (no_ba, tgl_survei, nama_petugas, kondisi_rumah_aset, keharmonisan_keluarga, relasi_sosial_warga, kesimpulan_rekomendasi) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt_master->execute([
-                $no_ba,
-                $_POST['tgl_survei'],
-                htmlspecialchars(trim($_POST['nama_petugas'])),
-                htmlspecialchars(trim($_POST['kondisi_rumah_aset'])),
-                htmlspecialchars(trim($_POST['keharmonisan_keluarga'])),
-                htmlspecialchars(trim($_POST['relasi_sosial_warga'])),
-                htmlspecialchars(trim($_POST['rekomendasi_petugas']))
+                $no_ba, $_POST['tgl_survei'], htmlspecialchars(trim($_POST['nama_petugas'])),
+                htmlspecialchars(trim($_POST['kondisi_rumah_aset'])), htmlspecialchars(trim($_POST['keharmonisan_keluarga'])),
+                htmlspecialchars(trim($_POST['relasi_sosial_warga'])), htmlspecialchars(trim($_POST['rekomendasi_petugas']))
             ]);
             $id_survei = $pdo_lokal->lastInsertId();
 
-            // 2. Insert Array Aset
             if (isset($_POST['aset_nama']) && is_array($_POST['aset_nama'])) {
                 $stmt_aset = $pdo_lokal->prepare("INSERT INTO t_survei_aset (id_survei, entitas, kategori_aset, nama_aset, kondisi_deskripsi, nilai_pasar) VALUES (?, ?, ?, ?, ?, ?)");
                 for ($i = 0; $i < count($_POST['aset_nama']); $i++) {
                     if (!empty($_POST['aset_nama'][$i])) {
                         $nilai = (float)str_replace(['Rp', '.', ' '], '', $_POST['aset_nilai'][$i]);
-                        $stmt_aset->execute([
-                            $id_survei, $_POST['aset_entitas'][$i], $_POST['aset_kategori'][$i],
-                            htmlspecialchars($_POST['aset_nama'][$i]), htmlspecialchars($_POST['aset_kondisi'][$i]), $nilai
-                        ]);
+                        $stmt_aset->execute([$id_survei, $_POST['aset_entitas'][$i], $_POST['aset_kategori'][$i], htmlspecialchars($_POST['aset_nama'][$i]), htmlspecialchars($_POST['aset_kondisi'][$i]), $nilai]);
                     }
                 }
             }
 
-            // 3. Insert Array Hutang Luar
             if (isset($_POST['hutang_sumber']) && is_array($_POST['hutang_sumber'])) {
                 $stmt_hutang = $pdo_lokal->prepare("INSERT INTO t_survei_hutang (id_survei, entitas, sumber_kreditur, tujuan_penggunaan, sisa_outstanding, angsuran_perbulan) VALUES (?, ?, ?, ?, ?, ?)");
                 for ($i = 0; $i < count($_POST['hutang_sumber']); $i++) {
                     if (!empty($_POST['hutang_sumber'][$i])) {
                         $sisa = (float)str_replace(['Rp', '.', ' '], '', $_POST['hutang_sisa'][$i]);
                         $angsuran = (float)str_replace(['Rp', '.', ' '], '', $_POST['hutang_angsuran'][$i]);
-                        $stmt_hutang->execute([
-                            $id_survei, $_POST['hutang_entitas'][$i], htmlspecialchars($_POST['hutang_sumber'][$i]),
-                            htmlspecialchars($_POST['hutang_tujuan'][$i]), $sisa, $angsuran
-                        ]);
+                        $stmt_hutang->execute([$id_survei, $_POST['hutang_entitas'][$i], htmlspecialchars($_POST['hutang_sumber'][$i]), htmlspecialchars($_POST['hutang_tujuan'][$i]), $sisa, $angsuran]);
                     }
                 }
             }
 
-            // 4. Insert Array Cashflow
             if (isset($_POST['cf_nama']) && is_array($_POST['cf_nama'])) {
                 $stmt_cf = $pdo_lokal->prepare("INSERT INTO t_survei_cashflow (id_survei, tipe_cf, entitas, nama_item, nominal_bulanan) VALUES (?, ?, ?, ?, ?)");
                 for ($i = 0; $i < count($_POST['cf_nama']); $i++) {
                     if (!empty($_POST['cf_nama'][$i])) {
                         $nominal = (float)str_replace(['Rp', '.', ' '], '', $_POST['cf_nominal'][$i]);
-                        $stmt_cf->execute([
-                            $id_survei, $_POST['cf_tipe'][$i], $_POST['cf_entitas'][$i], htmlspecialchars($_POST['cf_nama'][$i]), $nominal
-                        ]);
+                        $stmt_cf->execute([$id_survei, $_POST['cf_tipe'][$i], $_POST['cf_entitas'][$i], htmlspecialchars($_POST['cf_nama'][$i]), $nominal]);
                     }
                 }
             }
 
-            // 5. Insert Array Siklus Usaha
             if (isset($_POST['usaha_kategori']) && is_array($_POST['usaha_kategori'])) {
                 $stmt_usaha = $pdo_lokal->prepare("INSERT INTO t_survei_usaha (id_survei, kategori_pekerjaan, deskripsi_skala, tgl_mulai_siklus, treatment_kegiatan, estimasi_modal_hpp, estimasi_tgl_panen, estimasi_pendapatan_kotor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 for ($i = 0; $i < count($_POST['usaha_kategori']); $i++) {
@@ -129,60 +111,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $pendapatan = (float)str_replace(['Rp', '.', ' '], '', $_POST['usaha_pendapatan'][$i]);
                         $tgl_mulai = !empty($_POST['usaha_tgl_mulai'][$i]) ? $_POST['usaha_tgl_mulai'][$i] : null;
                         $tgl_panen = !empty($_POST['usaha_tgl_panen'][$i]) ? $_POST['usaha_tgl_panen'][$i] : null;
-                        
-                        $stmt_usaha->execute([
-                            $id_survei, htmlspecialchars($_POST['usaha_kategori'][$i]), htmlspecialchars($_POST['usaha_deskripsi'][$i]),
-                            $tgl_mulai, htmlspecialchars($_POST['usaha_treatment'][$i]), $modal, $tgl_panen, $pendapatan
-                        ]);
+                        $stmt_usaha->execute([$id_survei, htmlspecialchars($_POST['usaha_kategori'][$i]), htmlspecialchars($_POST['usaha_deskripsi'][$i]), $tgl_mulai, htmlspecialchars($_POST['usaha_treatment'][$i]), $modal, $tgl_panen, $pendapatan]);
                     }
                 }
             }
 
-            // 6. Insert Array RAB / Harapan
             if (isset($_POST['rab_item']) && is_array($_POST['rab_item'])) {
                 $stmt_rab = $pdo_lokal->prepare("INSERT INTO t_survei_rab (id_survei, entitas, item_rencana, estimasi_biaya) VALUES (?, ?, ?, ?)");
                 for ($i = 0; $i < count($_POST['rab_item']); $i++) {
                     if (!empty($_POST['rab_item'][$i])) {
                         $biaya = (float)str_replace(['Rp', '.', ' '], '', $_POST['rab_biaya'][$i]);
-                        $stmt_rab->execute([
-                            $id_survei, $_POST['rab_entitas'][$i], htmlspecialchars($_POST['rab_item'][$i]), $biaya
-                        ]);
+                        $stmt_rab->execute([$id_survei, $_POST['rab_entitas'][$i], htmlspecialchars($_POST['rab_item'][$i]), $biaya]);
                     }
                 }
             }
 
-            // 7. Insert & Analisis Aktuaria Kesehatan
             $punya_bpjs = $_POST['kes_bpjs'] ?? 'Tidak';
             $punya_jiwa = $_POST['kes_jiwa'] ?? 'Tidak';
             $premi = !empty($_POST['kes_premi']) ? (float)str_replace(['Rp', '.', ' '], '', $_POST['kes_premi']) : 0;
             $up = !empty($_POST['kes_up']) ? (float)str_replace(['Rp', '.', ' '], '', $_POST['kes_up']) : 0;
             $kronis = htmlspecialchars(trim($_POST['kes_kronis']));
             
-            // Logika Sistem Pakar Sederhana (Aktuaria)
             $analisis_coverage = "Coverage Standar.";
-            if ($punya_bpjs == 'Tidak' && !empty($kronis)) {
-                $analisis_coverage = "RISIKO TINGGI: Terdapat riwayat penyakit kronis namun tidak memiliki jaminan kesehatan (BPJS/Asuransi). Rentan kebangkrutan medis yang memicu gagal bayar kredit.";
-            } elseif ($punya_bpjs == 'Ya' && !empty($kronis)) {
-                $analisis_coverage = "Risiko Terukur: Penyakit kronis tercover BPJS.";
-            }
-            if ($punya_jiwa == 'Ya' && $up > 0) {
-                $analisis_coverage .= " Keamanan Ekstra: Anggota memiliki Asuransi Jiwa dengan UP Rp " . number_format($up,0,',','.');
-            }
+            if ($punya_bpjs == 'Tidak' && !empty($kronis)) { $analisis_coverage = "RISIKO TINGGI: Terdapat riwayat penyakit kronis namun tidak memiliki jaminan kesehatan (BPJS)."; } 
+            elseif ($punya_bpjs == 'Ya' && !empty($kronis)) { $analisis_coverage = "Risiko Terukur: Penyakit kronis tercover BPJS."; }
+            if ($punya_jiwa == 'Ya' && $up > 0) { $analisis_coverage .= " Memiliki Asuransi Jiwa tambahan."; }
 
-            $stmt_kes = $pdo_lokal->prepare("
-                INSERT INTO t_survei_kesehatan (id_survei, punya_bpjs, kelas_bpjs_asuransi, premi_perbulan, punya_asuransi_jiwa, up_jiwa, riwayat_penyakit_umum, riwayat_penyakit_kronis, analisis_coverage) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt_kes->execute([
-                $id_survei, $punya_bpjs, htmlspecialchars($_POST['kes_kelas']), $premi, $punya_jiwa, $up,
-                htmlspecialchars(trim($_POST['kes_umum'])), $kronis, $analisis_coverage
-            ]);
+            $stmt_kes = $pdo_lokal->prepare("INSERT INTO t_survei_kesehatan (id_survei, punya_bpjs, kelas_bpjs_asuransi, premi_perbulan, punya_asuransi_jiwa, up_jiwa, riwayat_penyakit_umum, riwayat_penyakit_kronis, analisis_coverage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_kes->execute([$id_survei, $punya_bpjs, htmlspecialchars($_POST['kes_kelas']), $premi, $punya_jiwa, $up, htmlspecialchars(trim($_POST['kes_umum'])), $kronis, $analisis_coverage]);
 
             $pdo_lokal->commit();
-            $success_msg = "Laporan Survei & Appraisal LOS berhasil direkam!";
+            $success_msg = "Data Profiling dan Evaluasi berhasil direkam!";
         } catch (PDOException $e) {
             $pdo_lokal->rollBack();
-            $error_msg = "Gagal menyimpan laporan kunjungan: " . htmlspecialchars($e->getMessage());
+            $error_msg = "Gagal menyimpan laporan profiling: " . htmlspecialchars($e->getMessage());
         }
     }
 
@@ -206,27 +168,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (in_array(strtolower($ext), $allowed_ext)) {
                 $file_sk_name = "sk_" . $no_ba . "_" . time() . "." . $ext;
                 $target_path = "../public/uploads/sk/" . $file_sk_name;
-                
                 if (!is_dir("../public/uploads/sk/")) { mkdir("../public/uploads/sk/", 0777, true); }
                 move_uploaded_file($file_tmp, $target_path);
             }
         }
 
         try {
-            $stmt_org = $pdo_lokal->prepare("
-                INSERT INTO t_organisasi (
-                    no_ba, nama_organisasi, id_kategori, id_jabatan, 
-                    id_wilayah, tahun_mulai, tahun_selesai, keterangan, file_bukti_sk
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt_org->execute([
-                $no_ba, $nama_org, $id_kategori, $id_jabatan, 
-                $id_wilayah, $tahun_mulai, $tahun_selesai, $keterangan, $file_sk_name
-            ]);
+            $stmt_org = $pdo_lokal->prepare("INSERT INTO t_organisasi (no_ba, nama_organisasi, id_kategori, id_jabatan, id_wilayah, tahun_mulai, tahun_selesai, keterangan, file_bukti_sk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_org->execute([$no_ba, $nama_org, $id_kategori, $id_jabatan, $id_wilayah, $tahun_mulai, $tahun_selesai, $keterangan, $file_sk_name]);
             $success_msg = "Pengalaman organisasi berhasil disimpan!";
-        } catch (PDOException $e) {
-            $error_msg = "Gagal menambah data organisasi: " . htmlspecialchars($e->getMessage());
-        }
+        } catch (PDOException $e) { $error_msg = "Gagal menambah data organisasi: " . htmlspecialchars($e->getMessage()); }
     }
 
     // Action Tambah Diklat CU (Tab 7)
@@ -245,25 +196,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (in_array(strtolower($ext), $allowed_ext)) {
                 $file_sertifikat_name = "sertifikat_" . $no_ba . "_" . time() . "." . $ext;
                 $target_path = "../public/uploads/sertifikat/" . $file_sertifikat_name;
-                
                 if (!is_dir("../public/uploads/sertifikat/")) { mkdir("../public/uploads/sertifikat/", 0777, true); }
                 move_uploaded_file($file_tmp, $target_path);
             }
         }
 
         try {
-            $stmt_diklat_ins = $pdo_lokal->prepare("
-                INSERT INTO t_diklat_anggota (
-                    no_ba, id_diklat, tanggal_pelaksanaan, penyelenggara, file_sertifikat
-                ) VALUES (?, ?, ?, ?, ?)
-            ");
-            $stmt_diklat_ins->execute([
-                $no_ba, $id_diklat, $tanggal_pelaksanaan, $penyelenggara, $file_sertifikat_name
-            ]);
+            $stmt_diklat_ins = $pdo_lokal->prepare("INSERT INTO t_diklat_anggota (no_ba, id_diklat, tanggal_pelaksanaan, penyelenggara, file_sertifikat) VALUES (?, ?, ?, ?, ?)");
+            $stmt_diklat_ins->execute([$no_ba, $id_diklat, $tanggal_pelaksanaan, $penyelenggara, $file_sertifikat_name]);
             $success_msg = "Riwayat Pendidikan/Diklat CU berhasil ditambahkan!";
-        } catch (PDOException $e) {
-            $error_msg = "Gagal menambah data diklat: " . htmlspecialchars($e->getMessage());
-        }
+        } catch (PDOException $e) { $error_msg = "Gagal menambah data diklat: " . htmlspecialchars($e->getMessage()); }
     }
 
     // Action Tambah Dokumen DMS (Tab 8)
@@ -281,28 +223,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (in_array(strtolower($ext), $allowed_ext)) {
                 $nama_file_doc = "doc_" . $no_ba . "_" . time() . "." . $ext;
                 $target_path = "../public/uploads/dokumen/" . $nama_file_doc;
-                
                 if (!is_dir("../public/uploads/dokumen/")) { mkdir("../public/uploads/dokumen/", 0777, true); }
-                
                 if (move_uploaded_file($file_tmp, $target_path)) {
                     try {
-                        $stmt_doc = $pdo_lokal->prepare("
-                            INSERT INTO t_dokumen_anggota (no_ba, kategori_dokumen, nama_file, keterangan) 
-                            VALUES (?, ?, ?, ?)
-                        ");
+                        $stmt_doc = $pdo_lokal->prepare("INSERT INTO t_dokumen_anggota (no_ba, kategori_dokumen, nama_file, keterangan) VALUES (?, ?, ?, ?)");
                         $stmt_doc->execute([$no_ba, $kategori_dokumen, $nama_file_doc, $keterangan]);
                         $success_msg = "Dokumen/Arsip digital berhasil diunggah ke sistem!";
-                    } catch (PDOException $e) {
-                        $error_msg = "Gagal menyimpan data dokumen: " . htmlspecialchars($e->getMessage());
-                    }
-                } else {
-                    $error_msg = "Gagal memindahkan file yang diunggah.";
+                    } catch (PDOException $e) { $error_msg = "Gagal menyimpan data dokumen: " . htmlspecialchars($e->getMessage()); }
                 }
-            } else {
-                $error_msg = "Format file tidak didukung. Harap gunakan PDF, JPG, atau PNG.";
-            }
-        } else {
-            $error_msg = "Tidak ada file yang dipilih atau terjadi kesalahan unggah.";
+            } else { $error_msg = "Format file tidak didukung."; }
         }
     }
 }
@@ -311,37 +240,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // 1. PENARIKAN DATA MASTER DARI CORE (CBS)
 // ==============================================================================
 try {
-    $stmt_core = $pdo_core->prepare("
-        SELECT 
-            a.No_BA, a.Kode_Cabang, c.Nama_Cabang, a.Kode_Jenis, a.Tgl_Masuk, a.Tgl_Penggunaan_Mobile, a.Status_Penggunaan_Mobile,
-            a.No_KK, a.Jenis_ID, a.No_ID, a.Nama, a.Jns_Kelamin, a.Tempat_Lahir, a.Tgl_Lahir, 
-            a.Agama, a.Status_Perkawinan, 
-            a.Alamat, a.No, a.RT, a.RW, a.Kelurahan, a.Kecamatan, a.Kota, a.Kode_Pos, 
-            a.No_Telp, a.No_HP, a.No_SMS_Gateway, a.Email, 
-            a.Status_Tempat_Tinggal, a.Alamat_Tinggal, a.No_Tinggal, a.RT_Tinggal, a.RW_Tinggal, 
-            a.Kelurahan_Tinggal, a.Kecamatan_Tinggal, a.Kota_Tinggal, a.Kode_Pos_Tinggal, 
-            a.Pendidikan_Terakhir, a.Pekerjaan, a.Instansi, a.Alamat_Instansi, a.No_Telp_Instansi, 
-            a.Tgl_Masuk_Karyawan, a.Divisi, a.Besar_Gaji, a.Sisa_Gaji, 
-            a.Nama_Bank, a.No_Rekening_Bank, 
-            a.Nama_Ahli_Waris1, a.Hubungan_Ahli_Waris1, a.Tempat_Lahir_Ahli_Waris1, a.Tgl_Lahir_Ahli_Waris1,
-            a.Nama_Ahli_Waris2, a.Hubungan_Ahli_Waris2, a.Tempat_Lahir_Ahli_Waris2, a.Tgl_Lahir_Ahli_Waris2,
-            a.Nama_Ahli_Waris3, a.Hubungan_Ahli_Waris3, a.Tempat_Lahir_Ahli_Waris3, a.Tgl_Lahir_Ahli_Waris3,
-            a.Nama_Ahli_Waris4, a.Hubungan_Ahli_Waris4, a.Tempat_Lahir_Ahli_Waris4, a.Tgl_Lahir_Ahli_Waris4,
-            a.Nama_Gadis_Ibu_Kandung, a.Status_Keanggotaan, 
-            a.AA_Saldo_SP, a.AA_Saldo_SW, a.AA_Saldo_SS, a.AA_Saldo_DS
-        FROM m_anggota a
-        LEFT JOIN m_cabang c ON TRIM(a.Kode_Cabang) = TRIM(c.Kode_Cabang)
-        WHERE TRIM(a.No_BA) = ?
-    ");
+    $stmt_core = $pdo_core->prepare("SELECT a.*, c.Nama_Cabang FROM m_anggota a LEFT JOIN m_cabang c ON TRIM(a.Kode_Cabang) = TRIM(c.Kode_Cabang) WHERE TRIM(a.No_BA) = ?");
     $stmt_core->execute([trim($no_ba)]);
     $data_core = $stmt_core->fetch(PDO::FETCH_ASSOC);
-
-    if (!$data_core) {
-        die("Data anggota tidak ditemukan di Core System.");
-    }
-} catch (PDOException $e) {
-    die("Terjadi kesalahan sistem Core: " . htmlspecialchars($e->getMessage()));
-}
+    if (!$data_core) die("Data anggota tidak ditemukan di Core System.");
+} catch (PDOException $e) { die("Terjadi kesalahan sistem Core: " . htmlspecialchars($e->getMessage())); }
 
 // ==============================================================================
 // 2. AUTO-DETECT & SYNC PEKERJAAN (Database Lokal)
@@ -389,34 +292,22 @@ try {
 } catch (PDOException $e) {}
 
 // ==============================================================================
-// 3. TARIK TRANSAKSI SIMPANAN & 4. REKENING HARIAN & 5. BERJANGKA & 6. PINJAMAN
+// 3. TARIK TRANSAKSI SIMPANAN, BERJANGKA & PINJAMAN (CORE)
 // ==============================================================================
 $trx_anggota = []; $pure_simpanan_harian = []; $sh_berjangka_display = []; $trx_simpanan_harian = [];
 $all_sh = []; $data_simpanan_berjangka = []; $data_pinjaman = []; $trx_pinjaman = [];
 
 try {
-    // Anggota
     $stmt_tr_anggota = $pdo_core->prepare("SELECT * FROM (SELECT Tgl_Transaksi, Kode_Sandi, Jml_SP, Jml_SW, Jml_SS, Saldo_SP, Saldo_SW, Saldo_SS, Keterangan FROM tr_anggota WHERE TRIM(No_BA) = ? ORDER BY Tgl_Transaksi DESC LIMIT 50) AS T1 ORDER BY Tgl_Transaksi ASC");
     $stmt_tr_anggota->execute([trim($no_ba)]); $trx_anggota = $stmt_tr_anggota->fetchAll(PDO::FETCH_ASSOC);
 
-    // Harian
-    $stmt_sh = $pdo_core->prepare("SELECT sh.No_RekeningSH, sh.Tgl_Masuk_SH, sh.Kode_Golongan, g.Nama_Golongan, sh.Saldo_Simpanan, sh.Status_Rekening, sh.Tgl_Keluar, sh.Alasan_Keluar, sh.Status_Pengagunan, sh.Setoran_Awal, sh.Jangka_Waktu, sh.Tgl_Jatuh_tempo, sh.Bunga_Yg_Berlaku, sh.Besar_Kewajiban_Simpanan FROM m_simpananharian sh LEFT JOIN m_golongansimpananharian g ON TRIM(sh.Kode_Golongan) = TRIM(g.Kode_Golongan) WHERE TRIM(sh.No_BA) = ?");
+    $stmt_sh = $pdo_core->prepare("SELECT sh.*, g.Nama_Golongan FROM m_simpananharian sh LEFT JOIN m_golongansimpananharian g ON TRIM(sh.Kode_Golongan) = TRIM(g.Kode_Golongan) WHERE TRIM(sh.No_BA) = ?");
     $stmt_sh->execute([trim($no_ba)]); $all_sh = $stmt_sh->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($all_sh as $sh) {
-        $jt = $sh['Tgl_Jatuh_tempo']; $kewajiban = (float) $sh['Besar_Kewajiban_Simpanan']; $setoran_awal = (float) $sh['Setoran_Awal'];
-        if ($jt === '1910-01-01' || $jt === '0000-00-00' || ($setoran_awal == 0 && $kewajiban == 0)) { $pure_simpanan_harian[] = $sh; } else { $sh_berjangka_display[] = $sh; }
-    }
-    if (!empty($all_sh)) {
-        $stmt_tr_sh = $pdo_core->prepare("SELECT * FROM (SELECT Tgl_Transaksi, Kode_Sandi, Debit, Kredit, Saldo, Keterangan FROM tr_simpananharian WHERE No_RekeningSH = ? ORDER BY Tgl_Transaksi DESC LIMIT 50) AS T2 ORDER BY Tgl_Transaksi ASC");
-        foreach ($all_sh as $sh) { $stmt_tr_sh->execute([$sh['No_RekeningSH']]); $trx_simpanan_harian[$sh['No_RekeningSH']] = $stmt_tr_sh->fetchAll(PDO::FETCH_ASSOC); }
-    }
 
-    // Berjangka
-    $stmt_sb = $pdo_core->prepare("SELECT sb.No_SertifikatSB, sb.Jml_Simpanan, sb.Jangka_Waktu, sb.Suku_Bunga_Saat_Ini, sb.Tgl_Mulai, sb.Status_Sertifikat, sb.Tgl_Pencairan, jsb.Jenis_Simpanan_Berjangka FROM m_simpananberjangka sb JOIN m_simpananharian sh ON TRIM(sb.No_RekeningSH) = TRIM(sh.No_RekeningSH) LEFT JOIN m_jenissimpananberjangka jsb ON TRIM(sb.Kode_Jenis) = TRIM(jsb.Kode_Jenis) WHERE TRIM(sh.No_BA) = ?");
+    $stmt_sb = $pdo_core->prepare("SELECT sb.*, jsb.Jenis_Simpanan_Berjangka FROM m_simpananberjangka sb JOIN m_simpananharian sh ON TRIM(sb.No_RekeningSH) = TRIM(sh.No_RekeningSH) LEFT JOIN m_jenissimpananberjangka jsb ON TRIM(sb.Kode_Jenis) = TRIM(jsb.Kode_Jenis) WHERE TRIM(sh.No_BA) = ?");
     $stmt_sb->execute([trim($no_ba)]); $data_simpanan_berjangka = $stmt_sb->fetchAll(PDO::FETCH_ASSOC);
 
-    // Pinjaman
-    $stmt_pj = $pdo_core->prepare("SELECT p.No_Pinjaman, p.Tgl_Pinjam, p.Tujuan_Pinjaman, p.Suku_Bunga, p.Jangka_Waktu, p.Status_Pinjaman, p.Saldo_Pinjaman, jp.Nama_Pinjaman AS Nama_Produk_Pinjaman FROM m_pinjaman p LEFT JOIN m_jenispinjaman jp ON TRIM(p.Jenis_Pinjaman) = TRIM(jp.Kode_Jenis) WHERE TRIM(p.No_BA) = ?");
+    $stmt_pj = $pdo_core->prepare("SELECT p.*, jp.Nama_Pinjaman AS Nama_Produk_Pinjaman FROM m_pinjaman p LEFT JOIN m_jenispinjaman jp ON TRIM(p.Jenis_Pinjaman) = TRIM(jp.Kode_Jenis) WHERE TRIM(p.No_BA) = ?");
     $stmt_pj->execute([trim($no_ba)]); $data_pinjaman = $stmt_pj->fetchAll(PDO::FETCH_ASSOC);
     if (!empty($data_pinjaman)) {
         $stmt_tr_pj = $pdo_core->prepare("SELECT * FROM (SELECT Tgl_Transaksi, Kode_Sandi, Angsuran, Bunga, Denda, Saldo, Keterangan FROM tr_pinjaman WHERE No_Pinjaman = ? ORDER BY Tgl_Transaksi DESC LIMIT 50) AS T3 ORDER BY Tgl_Transaksi ASC");
@@ -425,46 +316,52 @@ try {
 } catch (PDOException $e) {}
 
 // ==============================================================================
-// 7. TARIK KELUARGA (TAB 4)
+// 7. TARIK KELUARGA & 9. ORGANISASI & 10. DIKLAT & 11. DMS
 // ==============================================================================
-$keluarga_core = []; $keluarga_lokal = [];
-if (!empty($data_core['No_KK']) && $data_core['No_KK'] != '-' && $data_core['No_KK'] != '0') {
-    try {
-        $stmt_kel_core = $pdo_core->prepare("SELECT a.No_BA, a.No_ID AS NIK, a.Nama, a.Kode_Cabang, c.Nama_Cabang FROM m_anggota a LEFT JOIN m_cabang c ON TRIM(a.Kode_Cabang) = TRIM(c.Kode_Cabang) WHERE a.No_KK = ? AND TRIM(a.No_BA) != ?");
-        $stmt_kel_core->execute([$data_core['No_KK'], trim($no_ba)]); $keluarga_core = $stmt_kel_core->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {}
-}
+$keluarga_core = []; $keluarga_lokal = []; $data_organisasi = []; $data_diklat = []; $data_dokumen = [];
+$master_kategori = []; $master_jabatan = []; $master_wilayah = []; $master_diklat = [];
+$skor_potensi = 0; $status_potensi = "Belum Ada Data"; $warna_potensi = "secondary";
+$status_diklat = "Belum Memenuhi Syarat Minimal"; $warna_diklat = "danger"; $total_skor_diklat = 0; $lulus_dikdas = false;
+
 try {
-    $stmt_kel_lokal = $pdo_lokal->prepare("SELECT k.* FROM t_keluarga k WHERE k.no_ba_utama = ? ORDER BY k.created_at DESC");
-    $stmt_kel_lokal->execute([$no_ba]); $hasil_lokal = $stmt_kel_lokal->fetchAll(PDO::FETCH_ASSOC);
-    if (!empty($hasil_lokal)) {
-        $stmt_cek_nik = $pdo_core->prepare("SELECT No_BA FROM m_anggota WHERE No_ID = ? LIMIT 1");
-        foreach ($hasil_lokal as $kl) {
-            $stmt_cek_nik->execute([$kl['nik']]); $core_match = $stmt_cek_nik->fetch(PDO::FETCH_ASSOC);
-            $kl['is_anggota_core'] = false; $kl['core_no_ba'] = null;
-            if ($core_match) { $kl['is_anggota_core'] = true; $kl['core_no_ba'] = $core_match['No_BA']; }
-            $keluarga_lokal[] = $kl;
-        }
+    $stmt_kel_lokal = $pdo_lokal->prepare("SELECT * FROM t_keluarga WHERE no_ba_utama = ? ORDER BY created_at DESC");
+    $stmt_kel_lokal->execute([$no_ba]); $keluarga_lokal = $stmt_kel_lokal->fetchAll(PDO::FETCH_ASSOC);
+
+    $master_kategori = $pdo_lokal->query("SELECT * FROM m_kategori_org ORDER BY id_kategori ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $master_jabatan = $pdo_lokal->query("SELECT * FROM m_jabatan_org ORDER BY id_jabatan ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $master_wilayah = $pdo_lokal->query("SELECT * FROM m_tingkat_wilayah ORDER BY id_wilayah ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmt_org = $pdo_lokal->prepare("SELECT t.id, t.nama_organisasi, t.tahun_mulai, t.tahun_selesai, t.keterangan, t.file_bukti_sk, t.is_verified, k.nama_kategori, k.bobot_nilai AS b_kat, j.nama_jabatan, j.bobot_nilai AS b_jab, w.nama_wilayah, w.bobot_nilai AS b_wil FROM t_organisasi t LEFT JOIN m_kategori_org k ON t.id_kategori = k.id_kategori LEFT JOIN m_jabatan_org j ON t.id_jabatan = j.id_jabatan LEFT JOIN m_tingkat_wilayah w ON t.id_wilayah = w.id_wilayah WHERE t.no_ba = ? ORDER BY t.tahun_mulai DESC");
+    $stmt_org->execute([$no_ba]); $data_organisasi = $stmt_org->fetchAll(PDO::FETCH_ASSOC);
+    if (!empty($data_organisasi)) {
+        foreach ($data_organisasi as &$org) { $org['skor_item'] = ((int)$org['b_kat']) * ((int)$org['b_jab']) * ((int)$org['b_wil']); $skor_potensi += $org['skor_item']; }
+        unset($org);
     }
+    if ($skor_potensi >= 60) { $status_potensi = "Sangat Unggul"; $warna_potensi = "success"; } elseif ($skor_potensi >= 20) { $status_potensi = "Potensial"; $warna_potensi = "primary"; } elseif ($skor_potensi > 0) { $status_potensi = "Kaderisasi Awal"; $warna_potensi = "warning"; }
+
+    $master_diklat = $pdo_lokal->query("SELECT * FROM m_jenis_diklat ORDER BY kategori ASC, bobot_nilai ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $stmt_diklat = $pdo_lokal->prepare("SELECT d.*, m.nama_diklat, m.kategori, m.bobot_nilai FROM t_diklat_anggota d JOIN m_jenis_diklat m ON d.id_diklat = m.id_diklat WHERE d.no_ba = ? ORDER BY d.tanggal_pelaksanaan DESC");
+    $stmt_diklat->execute([$no_ba]); $data_diklat = $stmt_diklat->fetchAll(PDO::FETCH_ASSOC);
+    if (!empty($data_diklat)) {
+        foreach ($data_diklat as $diklat) { $total_skor_diklat += (int) $diklat['bobot_nilai']; if ($diklat['kategori'] === 'Wajib/Dasar') { $lulus_dikdas = true; } }
+    }
+    if ($lulus_dikdas) { $status_diklat = "Layak & Lulus Syarat Minimal"; $warna_diklat = "success"; }
+
+    $stmt_doc_get = $pdo_lokal->prepare("SELECT * FROM t_dokumen_anggota WHERE no_ba = ? ORDER BY tgl_upload DESC");
+    $stmt_doc_get->execute([$no_ba]); $data_dokumen = $stmt_doc_get->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {}
 
 // ==============================================================================
-// 8. TARIK DATA SURVEI RELASIONAL LOS (TAB 5)
+// 8. TARIK DATA SURVEI PROFILING (TAB 5)
 // ==============================================================================
-$data_survei_master = []; 
-$detail_aset = []; $detail_hutang = []; $detail_cf = []; 
-$detail_usaha = []; $detail_rab = []; $detail_kesehatan = [];
-
+$data_survei_master = []; $detail_aset = []; $detail_hutang = []; $detail_cf = []; $detail_usaha = []; $detail_rab = []; $detail_kesehatan = [];
 try {
-    // Ambil semua histori master survei
     $stmt_master = $pdo_lokal->prepare("SELECT * FROM t_survei_master WHERE no_ba = ? ORDER BY tgl_survei DESC");
     $stmt_master->execute([$no_ba]);
     $data_survei_master = $stmt_master->fetchAll(PDO::FETCH_ASSOC);
 
-    // Jika ada data survei, ambil child tables untuk survei TERBARU (index 0) agar bisa diproses di Rapor Keuangan
     if (!empty($data_survei_master)) {
         $id_survei_latest = $data_survei_master[0]['id_survei'];
-        
         $detail_aset = $pdo_lokal->query("SELECT * FROM t_survei_aset WHERE id_survei = $id_survei_latest")->fetchAll(PDO::FETCH_ASSOC);
         $detail_hutang = $pdo_lokal->query("SELECT * FROM t_survei_hutang WHERE id_survei = $id_survei_latest")->fetchAll(PDO::FETCH_ASSOC);
         $detail_cf = $pdo_lokal->query("SELECT * FROM t_survei_cashflow WHERE id_survei = $id_survei_latest")->fetchAll(PDO::FETCH_ASSOC);
@@ -475,49 +372,7 @@ try {
 } catch (PDOException $e) {}
 
 // ==============================================================================
-// 9. DATA-READY DSS PORTOFOLIO ORGANISASI (TAB 6)
-// ==============================================================================
-$master_kategori = []; $master_jabatan = []; $master_wilayah = []; $data_organisasi = [];
-$skor_potensi = 0; $status_potensi = "Belum Ada Data"; $warna_potensi = "secondary";
-try {
-    $master_kategori = $pdo_lokal->query("SELECT * FROM m_kategori_org ORDER BY id_kategori ASC")->fetchAll(PDO::FETCH_ASSOC);
-    $master_jabatan = $pdo_lokal->query("SELECT * FROM m_jabatan_org ORDER BY id_jabatan ASC")->fetchAll(PDO::FETCH_ASSOC);
-    $master_wilayah = $pdo_lokal->query("SELECT * FROM m_tingkat_wilayah ORDER BY id_wilayah ASC")->fetchAll(PDO::FETCH_ASSOC);
-
-    $stmt_org = $pdo_lokal->prepare("SELECT t.id, t.nama_organisasi, t.tahun_mulai, t.tahun_selesai, t.keterangan, t.file_bukti_sk, t.is_verified, k.nama_kategori, k.bobot_nilai AS b_kat, j.nama_jabatan, j.bobot_nilai AS b_jab, w.nama_wilayah, w.bobot_nilai AS b_wil FROM t_organisasi t LEFT JOIN m_kategori_org k ON t.id_kategori = k.id_kategori LEFT JOIN m_jabatan_org j ON t.id_jabatan = j.id_jabatan LEFT JOIN m_tingkat_wilayah w ON t.id_wilayah = w.id_wilayah WHERE t.no_ba = ? ORDER BY t.tahun_mulai DESC");
-    $stmt_org->execute([$no_ba]); $data_organisasi = $stmt_org->fetchAll(PDO::FETCH_ASSOC);
-    if (!empty($data_organisasi)) {
-        foreach ($data_organisasi as &$org) { $sub_total = ((int)$org['b_kat']) * ((int)$org['b_jab']) * ((int)$org['b_wil']); $org['skor_item'] = $sub_total; $skor_potensi += $sub_total; }
-        unset($org);
-    }
-    if ($skor_potensi >= 60) { $status_potensi = "Sangat Unggul"; $warna_potensi = "success"; } elseif ($skor_potensi >= 20) { $status_potensi = "Potensial"; $warna_potensi = "primary"; } elseif ($skor_potensi > 0) { $status_potensi = "Kaderisasi Awal"; $warna_potensi = "warning"; }
-} catch (PDOException $e) {}
-
-// ==============================================================================
-// 10. DATA-READY DSS PENDIDIKAN / DIKLAT CU (TAB 7)
-// ==============================================================================
-$master_diklat = []; $data_diklat = []; $status_diklat = "Belum Memenuhi Syarat Minimal"; $warna_diklat = "danger"; $total_skor_diklat = 0; $lulus_dikdas = false;
-try {
-    $master_diklat = $pdo_lokal->query("SELECT * FROM m_jenis_diklat ORDER BY kategori ASC, bobot_nilai ASC")->fetchAll(PDO::FETCH_ASSOC);
-    $stmt_diklat = $pdo_lokal->prepare("SELECT d.*, m.nama_diklat, m.kategori, m.bobot_nilai FROM t_diklat_anggota d JOIN m_jenis_diklat m ON d.id_diklat = m.id_diklat WHERE d.no_ba = ? ORDER BY d.tanggal_pelaksanaan DESC");
-    $stmt_diklat->execute([$no_ba]); $data_diklat = $stmt_diklat->fetchAll(PDO::FETCH_ASSOC);
-    if (!empty($data_diklat)) {
-        foreach ($data_diklat as $diklat) { $total_skor_diklat += (int) $diklat['bobot_nilai']; if ($diklat['kategori'] === 'Wajib/Dasar') { $lulus_dikdas = true; } }
-    }
-    if ($lulus_dikdas) { $status_diklat = "Layak & Lulus Syarat Minimal"; $warna_diklat = "success"; }
-} catch (PDOException $e) {}
-
-// ==============================================================================
-// 11. TARIK DATA DOKUMEN / DMS (TAB 8)
-// ==============================================================================
-$data_dokumen = [];
-try {
-    $stmt_doc_get = $pdo_lokal->prepare("SELECT * FROM t_dokumen_anggota WHERE no_ba = ? ORDER BY tgl_upload DESC");
-    $stmt_doc_get->execute([$no_ba]); $data_dokumen = $stmt_doc_get->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
-
-// ==============================================================================
-// 12. ANALISIS KEUANGAN & RAPOR ANGGOTA (REVISED FOR LOS RELATIONAL)
+// 12. ANALISIS KEUANGAN, RAPOR ANGGOTA & NARASI PENDAMPINGAN (FULL FIX)
 // ==============================================================================
 $rapor = [
     'total_aset_core' => 0, 'total_hutang_core' => 0,
@@ -526,52 +381,42 @@ $rapor = [
     'grand_total_aset' => 0, 'grand_total_hutang' => 0,
     'der' => 0, 'der_status' => '', 'der_color' => '',
     'total_pemasukan_cf' => 0, 'total_pengeluaran_cf' => 0, 'surplus_defisit' => 0,
+    'total_rab_biaya' => 0,
     'rpc_status' => '', 'rpc_color' => '',
-    'badges' => []
+    'badges' => [],
+    'narasi_profiling' => '',
+    'rekomendasi_pendampingan' => []
 ];
 
-// A. Hitung Aset & Hutang dari Core System
+// A. Hitung Ekuitas & Kewajiban dari Core System
 $rapor['total_aset_core'] += ((float)$data_core['AA_Saldo_SP'] + (float)$data_core['AA_Saldo_SW'] + (float)$data_core['AA_Saldo_SS']);
 foreach($all_sh as $sh) { $rapor['total_aset_core'] += (float)$sh['Saldo_Simpanan']; }
 foreach($data_simpanan_berjangka as $sb) { $rapor['total_aset_core'] += (float)$sb['Jml_Simpanan']; }
+foreach($data_pinjaman as $pj) { if($pj['Status_Pinjaman'] == '0') { $rapor['total_hutang_core'] += (float)$pj['Saldo_Pinjaman']; } }
 
-foreach($data_pinjaman as $pj) {
-    if($pj['Status_Pinjaman'] == '0') { $rapor['total_hutang_core'] += (float)$pj['Saldo_Pinjaman']; }
-}
-
-// B. Hitung Aset, Hutang, & Cashflow dari Data Survei Relasional (Lokal)
+// B. Kalkulasi Variabel Form Profiling Dinamis (Lokal)
 if (!empty($data_survei_master)) {
-    // Iterasi Aset Relasional
-    foreach($detail_aset as $ast) {
-        if($ast['entitas'] == 'Keluarga') { $rapor['total_aset_keluarga'] += (float)$ast['nilai_pasar']; }
-        else { $rapor['total_aset_usaha'] += (float)$ast['nilai_pasar']; }
-    }
-    // Iterasi Hutang Relasional
-    foreach($detail_hutang as $htg) {
-        if($htg['entitas'] == 'Keluarga') { $rapor['total_hutang_keluarga'] += (float)$htg['sisa_outstanding']; }
-        else { $rapor['total_hutang_usaha'] += (float)$htg['sisa_outstanding']; }
-    }
-    // Iterasi Cashflow Relasional
-    foreach($detail_cf as $cf) {
-        if($cf['tipe_cf'] == 'Pemasukan') { $rapor['total_pemasukan_cf'] += (float)$cf['nominal_bulanan']; }
-        else { $rapor['total_pengeluaran_cf'] += (float)$cf['nominal_bulanan']; }
-    }
-    
+    foreach($detail_aset as $ast) { $ast['entitas'] == 'Keluarga' ? $rapor['total_aset_keluarga'] += (float)$ast['nilai_pasar'] : $rapor['total_aset_usaha'] += (float)$ast['nilai_pasar']; }
+    foreach($detail_hutang as $htg) { $htg['entitas'] == 'Keluarga' ? $rapor['total_hutang_keluarga'] += (float)$htg['sisa_outstanding'] : $rapor['total_hutang_usaha'] += (float)$htg['sisa_outstanding']; }
+    foreach($detail_cf as $cf) { $cf['tipe_cf'] == 'Pemasukan' ? $rapor['total_pemasukan_cf'] += (float)$cf['nominal_bulanan'] : $rapor['total_pengeluaran_cf'] += (float)$cf['nominal_bulanan']; }
+    foreach($detail_rab as $rb) { $rapor['total_rab_biaya'] += (float)$rb['estimasi_biaya']; }
+
     $rapor['surplus_defisit'] = $rapor['total_pemasukan_cf'] - $rapor['total_pengeluaran_cf'];
-    
+
+    // RPC (Repayment Capacity) Status
     if ($rapor['total_pemasukan_cf'] > 0) {
         $rasio_surplus = ($rapor['surplus_defisit'] / $rapor['total_pemasukan_cf']) * 100;
         if ($rasio_surplus >= 20) { $rapor['rpc_status'] = 'Sangat Sehat (Surplus Kapasitas Baik)'; $rapor['rpc_color'] = 'success'; }
         elseif ($rasio_surplus > 0) { $rapor['rpc_status'] = 'Cukup (Surplus Tipis)'; $rapor['rpc_color'] = 'primary'; }
-        else { $rapor['rpc_status'] = 'Defisit (Risiko Gagal Bayar)'; $rapor['rpc_color'] = 'danger'; }
+        else { $rapor['rpc_status'] = 'Defisit (Risiko Gagal Bayar Tinggi)'; $rapor['rpc_color'] = 'danger'; }
     } else {
-        $rapor['rpc_status'] = 'Tidak Teridentifikasi Pemasukan'; $rapor['rpc_color'] = 'danger';
+        $rapor['rpc_status'] = 'Tidak Teridentifikasi Pemasukan di Arus Kas'; $rapor['rpc_color'] = 'danger';
     }
 } else {
     $rapor['rpc_status'] = 'Belum Ada Data Survei Lapangan'; $rapor['rpc_color'] = 'secondary';
 }
 
-// C. Konsolidasi Final Rasio DER
+// C. Konsolidasi Final Executive Summary (DER & Total Harta)
 $rapor['grand_total_aset'] = $rapor['total_aset_core'] + $rapor['total_aset_keluarga'] + $rapor['total_aset_usaha'];
 $rapor['grand_total_hutang'] = $rapor['total_hutang_core'] + $rapor['total_hutang_keluarga'] + $rapor['total_hutang_usaha'];
 
@@ -582,7 +427,7 @@ if ($rapor['der'] < 50) { $rapor['der_status'] = 'Sehat (Risiko Rendah)'; $rapor
 elseif ($rapor['der'] <= 80) { $rapor['der_status'] = 'Waspada (Risiko Menengah)'; $rapor['der_color'] = 'warning'; }
 else { $rapor['der_status'] = 'Berisiko Tinggi (Overleverage)'; $rapor['der_color'] = 'danger'; }
 
-// D. Algoritma Rekomendasi / Badges
+// D. Algoritma Badges Rekomendasi (Dashboard Executive)
 if (!empty($data_survei_master)) {
     if ($rapor['der'] < 50 && $rapor['surplus_defisit'] > 0) {
         $rapor['badges'][] = ['bg' => 'success', 'icon' => 'bi-star-fill', 'text' => 'Karakter & Kapasitas Baik'];
@@ -598,6 +443,54 @@ if (!empty($data_survei_master)) {
     $rapor['badges'][] = ['bg' => 'secondary', 'icon' => 'bi-question-circle', 'text' => 'Data Appraisal Kosong'];
 }
 
+// E. GENERATOR NARASI PROFILING & REKOMENDASI PENDAMPINGAN (MENTORSHIP)
+$umur_anggota = date_diff(date_create($data_core['Tgl_Lahir']), date_create('today'))->y;
+$jml_keluarga = count($keluarga_lokal) + count($keluarga_core);
+$net_worth = ($rapor['total_aset_keluarga'] + $rapor['total_aset_usaha']) - ($rapor['total_hutang_keluarga'] + $rapor['total_hutang_usaha']);
+
+if (!empty($data_survei_master)) {
+    $pekerjaan_teks = $data_core['Pekerjaan'] ?: 'Pekerjaan Mandiri';
+    $kondisi_sosial = htmlspecialchars($data_survei_master[0]['keharmonisan_keluarga']) . " dengan aktivitas sosial " . htmlspecialchars($data_survei_master[0]['relasi_sosial_warga']);
+    
+    $usaha_teks = "";
+    if (count($detail_usaha) > 0) {
+        $arr_usaha = [];
+        foreach($detail_usaha as $u) { $arr_usaha[] = $u['deskripsi_skala']; }
+        $usaha_teks = " Anggota juga menjalankan siklus usaha/pekerjaan berupa " . implode(", ", $arr_usaha) . ".";
+    }
+
+    // Bangun Paragraf Narasi
+    $rapor['narasi_profiling'] = "Anggota atas nama <strong>" . htmlspecialchars($data_core['Nama']) . "</strong>, saat ini berusia $umur_anggota tahun dan bekerja di sektor $pekerjaan_teks." . $usaha_teks . " Beliau tercatat memiliki $jml_keluarga tanggungan/anggota keluarga. Dari kacamata sosial, profil anggota dikategorikan $kondisi_sosial. Secara ekonomi, total arus kas masuk per bulan mencapai Rp " . number_format($rapor['total_pemasukan_cf'],0,',','.') . " dengan beban pengeluaran Rp " . number_format($rapor['total_pengeluaran_cf'],0,',','.') . ", menyisakan surplus bersih sebesar Rp " . number_format($rapor['surplus_defisit'],0,',','.') . "/bulan. Total kekayaan bersih (Net Worth riil) di luar Core tercatat senilai Rp " . number_format($net_worth,0,',','.') . ". Ke depannya, anggota merencanakan beberapa harapan/RAB yang membutuhkan proyeksi dana sekitar Rp " . number_format($rapor['total_rab_biaya'],0,',','.') . ".";
+
+    // Susun Poin Rekomendasi
+    if (count($detail_usaha) > 0) {
+        $rapor['rekomendasi_pendampingan'][] = ['aspek' => 'Peningkatan Usaha & Produksi', 'icon' => 'bi-graph-up-arrow', 'color' => 'success', 'saran' => 'Disarankan untuk mendampingi anggota dalam melakukan diversifikasi komoditas atau memperbaiki SOP pada siklus usahanya. Penguatan pencatatan HPP dan penjadwalan panen perlu disupervisi agar margin laba bisa ditingkatkan.'];
+    } else {
+        $rapor['rekomendasi_pendampingan'][] = ['aspek' => 'Penciptaan Pendapatan Baru', 'icon' => 'bi-lightbulb', 'color' => 'warning', 'saran' => 'Anggota saat ini hanya mengandalkan pendapatan tetap. Perlu didorong melalui diklat kewirausahaan CU untuk memulai usaha sampingan berskala mikro demi menambah keran penghasilan keluarga.'];
+    }
+
+    if ($detail_kesehatan && $detail_kesehatan['punya_bpjs'] == 'Tidak') {
+        $rapor['rekomendasi_pendampingan'][] = ['aspek' => 'Jaring Pengaman Sosial (Kesehatan)', 'icon' => 'bi-heart-pulse', 'color' => 'danger', 'saran' => 'Prioritas Utama: Edukasi dan bantu anggota untuk segera mendaftar BPJS Kesehatan. Ketiadaan jaminan ini sangat berisiko menghancurkan ekonomi keluarga jika terjadi sakit.'];
+    }
+
+    if ($rapor['total_rab_biaya'] > 0) {
+        $max_angsuran = $rapor['surplus_defisit'] > 0 ? $rapor['surplus_defisit'] * 0.40 : 0;
+        $aset_agunan = 0;
+        foreach($detail_aset as $ast) { if(in_array($ast['kategori_aset'], ['Aset Tetap (Tanah/Rumah)', 'Kendaraan', 'Peralatan/Mesin'])) { $aset_agunan += (float)$ast['nilai_pasar']; } }
+        $max_plafon = $aset_agunan * 0.70;
+
+        $saran_kredit = "Anggota memiliki target RAB Rp " . number_format($rapor['total_rab_biaya'],0,',','.') . ". ";
+        if ($rapor['surplus_defisit'] > 0 && $max_angsuran > 0) {
+            $saran_kredit .= "Jika difasilitasi produk pinjaman CU, <strong>batas aman angsuran maksimal adalah Rp " . number_format($max_angsuran,0,',','.') . "/bulan</strong> (40% dari surplus kas). Berdasarkan nilai aset riil yang dijaminkan, <strong>rekomendasi maksimal plafon kredit adalah Rp " . number_format($max_plafon,0,',','.') . "</strong>.";
+        } else {
+            $saran_kredit .= "TIDAK DIREKOMENDASIKAN mengambil pinjaman saat ini karena arus kas mengalami defisit atau tidak ada surplus yang mencukupi untuk angsuran.";
+        }
+        $rapor['rekomendasi_pendampingan'][] = ['aspek' => 'Analisis Kapasitas Pinjaman & Pencapaian RAB', 'icon' => 'bi-safe', 'color' => 'primary', 'saran' => $saran_kredit];
+    }
+} else {
+    $rapor['narasi_profiling'] = "Belum ada data survei atau profiling lapangan yang direkam untuk anggota ini. Silakan agendakan kunjungan pendampingan pertama untuk membuka kunci analisis data.";
+}
+
 // Konfigurasi Halaman
 $page_title = "Profil " . htmlspecialchars($data_core['Nama']);
 $show_sidebar = true;
@@ -608,5 +501,6 @@ function format_tgl_lahir($tgl) {
     return date('d M Y', strtotime($tgl));
 }
 
+// LEMPAR SEMUA VARIABEL KE VIEW
 require_once '../app/Views/profil.php';
 ?>
